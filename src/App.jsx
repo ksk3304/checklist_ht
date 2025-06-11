@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
 import ProjectDashboard from './components/ProjectDashboard'
 import TaskList from './components/TaskList'
 import './App.css'
 
-function App() {
+function AppContent() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -34,7 +34,13 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>チームチェックリスト</h1>
+        {session ? (
+          <Link to="/" className="app-title">
+            <h1>チームチェックリスト</h1>
+          </Link>
+        ) : (
+          <h1>チームチェックリスト</h1>
+        )}
         {session && (
           <button 
             onClick={() => supabase.auth.signOut()}
@@ -49,15 +55,21 @@ function App() {
         {!session ? (
           <Auth />
         ) : (
-          <Router>
-            <Routes>
-              <Route path="/" element={<ProjectDashboard session={session} />} />
-              <Route path="/project/:projectId" element={<TaskList session={session} />} />
-            </Routes>
-          </Router>
+          <Routes>
+            <Route path="/" element={<ProjectDashboard session={session} />} />
+            <Route path="/project/:projectId" element={<TaskList session={session} />} />
+          </Routes>
         )}
       </main>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   )
 }
 

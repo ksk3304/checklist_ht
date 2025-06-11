@@ -29,6 +29,19 @@ body {
   font-size: 1.5rem;
 }
 
+.app-title {
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.app-title:hover {
+  opacity: 0.8;
+}
+
+.app-title h1 {
+  margin: 0;
+}
+
 .logout-btn {
   background: #dc2626;
   color: white;
