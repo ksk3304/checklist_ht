@@ -480,12 +480,6 @@ body {
   margin-bottom: 2rem;
 }
 
-.project-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
 
 .back-btn {
   background: #6b7280;
@@ -494,28 +488,12 @@ body {
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
+  margin-bottom: 1rem;
   font-size: 0.9rem;
-  text-decoration: none;
 }
 
 .back-btn:hover {
   background: #4b5563;
-}
-
-.external-link-btn {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  text-decoration: none;
-  transition: background-color 0.2s;
-}
-
-.external-link-btn:hover {
-  background: #1d4ed8;
 }
 
 .project-header h2 {
