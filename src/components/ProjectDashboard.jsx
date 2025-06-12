@@ -119,7 +119,9 @@ function ProjectDashboard({ session }) {
               >
                 <h3>{project.name}</h3>
                 {project.description && (
-                  <p className="project-description">{project.description}</p>
+                  <p className="project-description" style={{ whiteSpace: 'pre-wrap' }}>
+                    {project.description}
+                  </p>
                 )}
                 <div className="project-meta">
                   <span className="created-date">

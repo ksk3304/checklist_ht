@@ -151,7 +151,9 @@ function TaskList({ session }) {
         </button>
         <h2>{project.name}</h2>
         {project.description && (
-          <p className="project-description">{project.description}</p>
+          <p className="project-description" style={{ whiteSpace: 'pre-wrap' }}>
+            {project.description}
+          </p>
         )}
       </div>
       {editingTask ? (
@@ -253,7 +255,11 @@ function TaskList({ session }) {
                   </select>
                 </div>
               </div>
-              {task.description && <p className="task-description">{task.description}</p>}
+              {task.description && (
+                <p className="task-description" style={{ whiteSpace: 'pre-wrap' }}>
+                  {task.description}
+                </p>
+              )}
               {task.due_date && (
                 <p className="task-due">期限: {new Date(task.due_date).toLocaleDateString('ja-JP')}</p>
               )}
