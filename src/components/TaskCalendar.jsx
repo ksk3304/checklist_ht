@@ -39,23 +39,31 @@ function TaskCalendar({ tasks }) {
         }, {})
 
         return (
-          <div 
-            className="calendar-task-indicators"
-            onMouseEnter={(e) => handleTileHover(e, date)}
-            onMouseLeave={handleTileLeave}
-          >
+          <div className="calendar-task-indicators">
             {statusCounts.pending && (
-              <div className="task-indicator pending" title={`未完了: ${statusCounts.pending}件`}>
+              <div 
+                className="task-indicator pending"
+                onMouseEnter={(e) => handleTileHover(e, date)}
+                onMouseLeave={handleTileLeave}
+              >
                 {statusCounts.pending}
               </div>
             )}
             {statusCounts.in_progress && (
-              <div className="task-indicator in_progress" title={`進行中: ${statusCounts.in_progress}件`}>
+              <div 
+                className="task-indicator in_progress"
+                onMouseEnter={(e) => handleTileHover(e, date)}
+                onMouseLeave={handleTileLeave}
+              >
                 {statusCounts.in_progress}
               </div>
             )}
             {statusCounts.completed && (
-              <div className="task-indicator completed" title={`完了: ${statusCounts.completed}件`}>
+              <div 
+                className="task-indicator completed"
+                onMouseEnter={(e) => handleTileHover(e, date)}
+                onMouseLeave={handleTileLeave}
+              >
                 {statusCounts.completed}
               </div>
             )}
