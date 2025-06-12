@@ -317,9 +317,19 @@ function TaskList({ session }) {
   return (
     <div className="task-list-container">
       <div className="project-header">
-        <button className="back-btn" onClick={() => navigate('/')}>
-          ← プロジェクト一覧に戻る
-        </button>
+        <div className="project-nav">
+          <button className="back-btn" onClick={() => navigate('/')}>
+            ← プロジェクト一覧に戻る
+          </button>
+          <a 
+            href="https://my-apps-gold.vercel.app/pages/work-assignment.html" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="external-link-btn"
+          >
+            作業割り当て →
+          </a>
+        </div>
         <h2>{project.name}</h2>
         {project.description && (
           <p className="project-description" style={{ whiteSpace: 'pre-wrap' }}>
