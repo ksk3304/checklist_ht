@@ -127,12 +127,25 @@ function TaskCalendar({ tasks }) {
               if (tasksByDate[dateString]) {
                 if (hoveredDate !== dateString) {
                   setHoveredDate(dateString)
-                  // カレンダーの右下に固定位置でツールチップを表示
+                  // カレンダーの位置とマウス位置から最適な場所を決定
                   const calendarRect = e.currentTarget.getBoundingClientRect()
-                  setTooltipPosition({
-                    x: calendarRect.right - 280,
-                    y: calendarRect.bottom + 10
-                  })
+                  const screenHeight = window.innerHeight
+                  const mouseY = e.clientY
+                  
+                  // 画面の半分より上にマウスがある場合は下に、下にある場合は上に表示
+                  if (mouseY < screenHeight / 2) {
+                    // 上半分：カレンダーの下に表示
+                    setTooltipPosition({
+                      x: calendarRect.right - 280,
+                      y: calendarRect.bottom + 10
+                    })
+                  } else {
+                    // 下半分：カレンダーの上に表示
+                    setTooltipPosition({
+                      x: calendarRect.right - 280,
+                      y: calendarRect.top - 150
+                    })
+                  }
                 }
               } else {
                 setHoveredDate(null)
