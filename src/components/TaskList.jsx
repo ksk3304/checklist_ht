@@ -45,7 +45,6 @@ function TaskList({ session }) {
         .select('*')
         .eq('project_id', projectId)
         .order('due_date', { ascending: true })
-        .order('display_order', { ascending: true })
       
       if (filter !== 'all') {
         query = query.eq('status', filter)
@@ -81,8 +80,7 @@ function TaskList({ session }) {
           due_date: newTask.due_date || null,
           created_by: session.user.id,
           assigned_to: session.user.id,
-          project_id: projectId,
-          display_order: maxOrder + 10
+          project_id: projectId
         }
       ])
       if (error) throw error
