@@ -127,28 +127,39 @@ function TaskCalendar({ tasks }) {
               if (tasksByDate[dateString]) {
                 if (hoveredDate !== dateString) {
                   setHoveredDate(dateString)
-                  // カレンダーの位置から最適な横位置を決定
+                  // カレンダーとマウス位置から最適な位置を決定
                   const calendarRect = e.currentTarget.getBoundingClientRect()
                   const screenWidth = window.innerWidth
+                  const screenHeight = window.innerHeight
                   const tooltipWidth = 250
+                  const mouseY = e.clientY
                   
-                  // 画面右側に十分なスペースがあるかチェック
+                  // 左右の配置を決定
                   const spaceOnRight = screenWidth - calendarRect.right
-                  const spaceOnLeft = calendarRect.left
+                  const isRightSide = spaceOnRight >= tooltipWidth / 2
                   
-                  if (spaceOnRight >= tooltipWidth) {
-                    // 右側に表示（カレンダーと少し被るくらい）
-                    setTooltipPosition({
-                      x: calendarRect.right - 50,
-                      y: calendarRect.top + 50
-                    })
+                  // 上下の配置を決定（画面の半分より上か下か）
+                  const isUpperHalf = mouseY < screenHeight / 2
+                  
+                  let x, y
+                  
+                  if (isRightSide) {
+                    // 右側：カレンダーと10px重なって表示
+                    x = calendarRect.right - 10
                   } else {
-                    // 左側に表示（カレンダーと少し被るくらい）
-                    setTooltipPosition({
-                      x: calendarRect.left - tooltipWidth + 50,
-                      y: calendarRect.top + 50
-                    })
+                    // 左側：カレンダーと10px重なって表示
+                    x = calendarRect.left - tooltipWidth + 10
                   }
+                  
+                  if (isUpperHalf) {
+                    // 上半分：カレンダーの上部に合わせて表示
+                    y = calendarRect.top + 20
+                  } else {
+                    // 下半分：カレンダーの下部に合わせて表示
+                    y = calendarRect.bottom - 140
+                  }
+                  
+                  setTooltipPosition({ x, y })
                 }
               } else {
                 setHoveredDate(null)
