@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
 
@@ -89,9 +89,11 @@ function TaskCalendar({ tasks }) {
     if (tasksOnDate && tasksOnDate.length > 0) {
       setHoveredDate(dateString)
       setTooltipPosition({
-        x: event.clientX,
-        y: event.clientY - 20
+        x: event.clientX + 10,
+        y: event.clientY - 80
       })
+    } else {
+      setHoveredDate(null)
     }
   }
 
@@ -99,56 +101,75 @@ function TaskCalendar({ tasks }) {
     setHoveredDate(null)
   }
 
+  // カレンダーのマウスイベントリスナーを追加
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      const tile = event.target.closest('.react-calendar__tile')
+      if (tile) {
+        const button = tile.querySelector('abbr')
+        if (button) {
+          const dateStr = tile.getAttribute('aria-label')
+          if (dateStr) {
+            try {
+              // aria-labelから日付を解析
+              const match = dateStr.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/)
+              if (match) {
+                const year = parseInt(match[1])
+                const month = parseInt(match[2]) - 1 // Dateオブジェクトでは月は0から始まる
+                const day = parseInt(match[3])
+                const date = new Date(year, month, day)
+                handleTileHover(event, date)
+              }
+            } catch (error) {
+              console.error('Date parsing error:', error)
+            }
+          }
+        }
+      }
+    }
+
+    const handleMouseLeave = () => {
+      setHoveredDate(null)
+    }
+
+    const calendarWrapper = document.querySelector('.calendar-wrapper')
+    if (calendarWrapper) {
+      calendarWrapper.addEventListener('mousemove', handleMouseMove)
+      calendarWrapper.addEventListener('mouseleave', handleMouseLeave)
+      
+      return () => {
+        calendarWrapper.removeEventListener('mousemove', handleMouseMove)
+        calendarWrapper.removeEventListener('mouseleave', handleMouseLeave)
+      }
+    }
+  }, [tasksByDate])
+
   return (
     <div className="task-calendar-container">
       <h3 className="calendar-title">タスクカレンダー</h3>
       
-      <div 
-        className="calendar-wrapper"
-        onMouseLeave={handleTileLeave}
-      >
+      <div className="calendar-wrapper">
         <Calendar
           value={selectedDate}
           onChange={setSelectedDate}
-          tileContent={({ date, view }) => {
+          tileContent={tileContent}
+          tileClassName={({ date, view }) => {
             if (view === 'month') {
               const dateString = date.toISOString().split('T')[0]
               const tasksOnDate = tasksByDate[dateString]
               
               if (tasksOnDate && tasksOnDate.length > 0) {
-                // ステータス別のカウント
-                const statusCounts = tasksOnDate.reduce((acc, task) => {
-                  acc[task.status] = (acc[task.status] || 0) + 1
-                  return acc
-                }, {})
-
-                return (
-                  <div 
-                    className="calendar-task-indicators"
-                    onMouseEnter={(e) => handleTileHover(e, date)}
-                  >
-                    {statusCounts.pending && (
-                      <div className="task-indicator pending" title={`未完了: ${statusCounts.pending}件`}>
-                        {statusCounts.pending}
-                      </div>
-                    )}
-                    {statusCounts.in_progress && (
-                      <div className="task-indicator in_progress" title={`進行中: ${statusCounts.in_progress}件`}>
-                        {statusCounts.in_progress}
-                      </div>
-                    )}
-                    {statusCounts.completed && (
-                      <div className="task-indicator completed" title={`完了: ${statusCounts.completed}件`}>
-                        {statusCounts.completed}
-                      </div>
-                    )}
-                  </div>
-                )
+                // 最も優先度の高いステータスに基づいてクラスを決定
+                const hasPending = tasksOnDate.some(task => task.status === 'pending')
+                const hasInProgress = tasksOnDate.some(task => task.status === 'in_progress')
+                
+                if (hasPending) return 'has-pending-tasks'
+                if (hasInProgress) return 'has-inprogress-tasks'
+                return 'has-completed-tasks'
               }
             }
             return null
           }}
-          tileClassName={tileClassName}
           locale="ja-JP"
           formatShortWeekday={(locale, date) => {
             const weekdays = ['日', '月', '火', '水', '木', '金', '土']

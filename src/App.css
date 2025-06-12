@@ -1024,6 +1024,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  cursor: pointer;
 }
 
 .react-calendar__tile:hover {
