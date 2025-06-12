@@ -426,6 +426,9 @@ function TaskList({ session }) {
           ))}
         </div>
       </div>
+
+      <TaskCalendar tasks={tasks} />
+
       {editingTask ? (
         <div className="task-form edit-form">
           <h3>タスクを編集</h3>
@@ -535,8 +538,6 @@ function TaskList({ session }) {
           </DndContext>
         )}
       </div>
-
-      <TaskCalendar tasks={tasks} />
     </div>
   )
 }
