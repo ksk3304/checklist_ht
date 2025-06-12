@@ -34,6 +34,8 @@ function TaskList({ session }) {
   const [editingMemoData, setEditingMemoData] = useState({ title: '', content: '' })
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all') // all, pending, in_progress, completed
+  const [showMemoForm, setShowMemoForm] = useState(false)
+  const [showTaskForm, setShowTaskForm] = useState(false)
 
   useEffect(() => {
     if (projectId) {
@@ -109,6 +111,7 @@ function TaskList({ session }) {
       if (error) throw error
       
       setNewTask({ title: '', description: '', due_date: '' })
+      setShowTaskForm(false)
       fetchTasks()
     } catch (error) {
       console.error('Error creating task:', error)
@@ -221,6 +224,7 @@ function TaskList({ session }) {
       if (error) throw error
       
       setNewMemo({ title: '', content: '' })
+      setShowMemoForm(false)
       fetchMemos()
     } catch (error) {
       console.error('Error creating memo:', error)
@@ -325,27 +329,35 @@ function TaskList({ session }) {
       </div>
 
       <div className="memo-section">
-        <h3 className="memo-section-title">備忘録</h3>
-        
-        <div className="add-memo-form">
-          <form onSubmit={createMemo}>
-            <input
-              type="text"
-              placeholder="タイトル"
-              value={newMemo.title}
-              onChange={(e) => setNewMemo({ ...newMemo, title: e.target.value })}
-              className="memo-input"
-            />
-            <textarea
-              placeholder="内容"
-              value={newMemo.content}
-              onChange={(e) => setNewMemo({ ...newMemo, content: e.target.value })}
-              className="memo-textarea"
-              rows={3}
-            />
-            <button type="submit" className="add-memo-btn">追加</button>
-          </form>
+        <div className="section-header" onClick={() => setShowMemoForm(!showMemoForm)}>
+          <h3 className="memo-section-title">備忘録</h3>
+          <span className={`toggle-arrow ${showMemoForm ? 'open' : ''}`}>▽</span>
         </div>
+        
+        {showMemoForm && (
+          <div className="add-memo-form">
+            <form onSubmit={createMemo}>
+              <input
+                type="text"
+                placeholder="タイトル"
+                value={newMemo.title}
+                onChange={(e) => setNewMemo({ ...newMemo, title: e.target.value })}
+                className="memo-input"
+              />
+              <textarea
+                placeholder="内容"
+                value={newMemo.content}
+                onChange={(e) => setNewMemo({ ...newMemo, content: e.target.value })}
+                className="memo-textarea"
+                rows={3}
+              />
+              <div className="form-actions">
+                <button type="submit" className="add-memo-btn">追加</button>
+                <button type="button" onClick={() => setShowMemoForm(false)} className="cancel-btn">キャンセル</button>
+              </div>
+            </form>
+          </div>
+        )}
 
         <div className="memos-list">
           {memos.map((memo) => (
@@ -443,27 +455,36 @@ function TaskList({ session }) {
         </div>
       ) : (
         <div className="task-form">
-          <h3>新しいタスクを追加</h3>
-          <form onSubmit={createTask}>
-          <input
-            type="text"
-            placeholder="タスク名"
-            value={newTask.title}
-            onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-            required
-          />
-          <textarea
-            placeholder="説明（任意）"
-            value={newTask.description}
-            onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-          />
-          <input
-            type="date"
-            value={newTask.due_date}
-            onChange={(e) => setNewTask({ ...newTask, due_date: e.target.value })}
-          />
-            <button type="submit">追加</button>
-          </form>
+          <div className="section-header" onClick={() => setShowTaskForm(!showTaskForm)}>
+            <h3>新しいタスクを追加</h3>
+            <span className={`toggle-arrow ${showTaskForm ? 'open' : ''}`}>▽</span>
+          </div>
+          
+          {showTaskForm && (
+            <form onSubmit={createTask}>
+              <input
+                type="text"
+                placeholder="タスク名"
+                value={newTask.title}
+                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                required
+              />
+              <textarea
+                placeholder="説明（任意）"
+                value={newTask.description}
+                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+              />
+              <input
+                type="date"
+                value={newTask.due_date}
+                onChange={(e) => setNewTask({ ...newTask, due_date: e.target.value })}
+              />
+              <div className="form-actions">
+                <button type="submit">追加</button>
+                <button type="button" onClick={() => setShowTaskForm(false)}>キャンセル</button>
+              </div>
+            </form>
+          )}
         </div>
       )}
 
