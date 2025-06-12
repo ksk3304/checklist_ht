@@ -102,22 +102,26 @@ function TaskCalendar({ tasks }) {
     setHoveredDate(null)
   }
 
-  useEffect(() => {
-    const calendar = calendarRef.current
-    if (!calendar) return
 
-    const handleMouseMove = (e) => {
-      const tile = e.target.closest('.react-calendar__tile')
-      if (tile) {
-        const dateStr = tile.getAttribute('aria-label')
-        if (dateStr) {
-          try {
-            const match = dateStr.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/)
-            if (match) {
-              const year = parseInt(match[1])
-              const month = parseInt(match[2]) - 1
-              const day = parseInt(match[3])
-              const date = new Date(year, month, day)
+
+  return (
+    <div className="task-calendar-container">
+      <h3 className="calendar-title">タスクカレンダー</h3>
+      
+      <div 
+        className="calendar-wrapper" 
+        onMouseMove={(e) => {
+          const tile = e.target.closest('.react-calendar__tile')
+          if (tile) {
+            const abbr = tile.querySelector('abbr')
+            if (abbr) {
+              const dayText = abbr.textContent
+              const currentDate = new Date()
+              const year = currentDate.getFullYear()
+              const month = currentDate.getMonth()
+              
+              // 現在表示されている月の日付を作成
+              const date = new Date(year, month, parseInt(dayText))
               const dateString = date.toISOString().split('T')[0]
               
               if (tasksByDate[dateString]) {
@@ -130,34 +134,12 @@ function TaskCalendar({ tasks }) {
                 setHoveredDate(null)
               }
             }
-          } catch (error) {
+          } else {
             setHoveredDate(null)
           }
-        }
-      } else {
-        setHoveredDate(null)
-      }
-    }
-
-    const handleMouseLeave = () => {
-      setHoveredDate(null)
-    }
-
-    calendar.addEventListener('mousemove', handleMouseMove)
-    calendar.addEventListener('mouseleave', handleMouseLeave)
-
-    return () => {
-      calendar.removeEventListener('mousemove', handleMouseMove)
-      calendar.removeEventListener('mouseleave', handleMouseLeave)
-    }
-  }, [tasksByDate])
-
-
-  return (
-    <div className="task-calendar-container">
-      <h3 className="calendar-title">タスクカレンダー</h3>
-      
-      <div className="calendar-wrapper" ref={calendarRef}>
+        }}
+        onMouseLeave={() => setHoveredDate(null)}
+      >
         <Calendar
           value={selectedDate}
           onChange={setSelectedDate}
