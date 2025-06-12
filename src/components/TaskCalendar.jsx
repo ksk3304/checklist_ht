@@ -149,15 +149,15 @@ function TaskCalendar({ tasks }) {
                     x = calendarRect.left - tooltipWidth - 5
                   }
                   
-                  // 縦位置はマウスの上下位置を加味
+                  // 縦位置はマウスの上下位置を加味（見切れ防止）
                   const screenHeight = window.innerHeight
                   
                   if (mouseY < screenHeight / 2) {
-                    // 上半分：カレンダーの上部寄り
-                    y = calendarRect.top + 50
-                  } else {
-                    // 下半分：カレンダーの下部寄り
+                    // 上半分：ツールチップを下に表示
                     y = calendarRect.bottom - 120
+                  } else {
+                    // 下半分：ツールチップを上に表示
+                    y = calendarRect.top + 50
                   }
                   
                   setTooltipPosition({ x, y })
