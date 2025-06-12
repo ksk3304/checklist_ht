@@ -90,10 +90,8 @@ function TaskCalendar({ tasks }) {
       setHoveredDate(dateString)
       setTooltipPosition({
         x: event.clientX,
-        y: event.clientY
+        y: event.clientY - 20
       })
-    } else {
-      setHoveredDate(null)
     }
   }
 
@@ -101,36 +99,48 @@ function TaskCalendar({ tasks }) {
     setHoveredDate(null)
   }
 
-  // カスタムタイルコンポーネント
-  const CustomTile = ({ date, children }) => {
-    return (
-      <div
-        onMouseEnter={(e) => handleTileHover(e, date)}
-        onMouseLeave={handleTileLeave}
-        style={{ position: 'relative', height: '100%' }}
-      >
-        {children}
-      </div>
-    )
-  }
-
   return (
     <div className="task-calendar-container">
       <h3 className="calendar-title">タスクカレンダー</h3>
       
       <div className="calendar-wrapper">
-        <Calendar
-          value={selectedDate}
-          onChange={setSelectedDate}
-          tileContent={tileContent}
-          tileClassName={tileClassName}
-          locale="ja-JP"
-          calendarType="iso8601"
-          formatShortWeekday={(locale, date) => {
-            const weekdays = ['日', '月', '火', '水', '木', '金', '土']
-            return weekdays[date.getDay()]
+        <div
+          onMouseLeave={handleTileLeave}
+          onMouseMove={(e) => {
+            // カレンダータイル上でマウス移動時の処理
+            const tile = e.target.closest('.react-calendar__tile')
+            if (tile) {
+              const ariaLabel = tile.getAttribute('aria-label')
+              if (ariaLabel) {
+                try {
+                  const dateMatch = ariaLabel.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/)
+                  if (dateMatch) {
+                    const year = dateMatch[1]
+                    const month = dateMatch[2].padStart(2, '0')
+                    const day = dateMatch[3].padStart(2, '0')
+                    const date = new Date(`${year}-${month}-${day}`)
+                    handleTileHover(e, date)
+                  }
+                } catch (error) {
+                  // 日付解析エラーは無視
+                }
+              }
+            }
           }}
-        />
+        >
+          <Calendar
+            value={selectedDate}
+            onChange={setSelectedDate}
+            tileContent={tileContent}
+            tileClassName={tileClassName}
+            locale="ja-JP"
+            calendarType="US"
+            formatShortWeekday={(locale, date) => {
+              const weekdays = ['日', '月', '火', '水', '木', '金', '土']
+              return weekdays[date.getDay()]
+            }}
+          />
+        </div>
       </div>
 
       {/* ツールチップ */}

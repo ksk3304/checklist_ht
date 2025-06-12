@@ -1011,18 +1011,18 @@ body {
 
 /* タスクがある日付のスタイル */
 .react-calendar__tile.has-pending-tasks {
-  background: #fef2f2;
-  border: 2px solid #fca5a5;
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
 }
 
 .react-calendar__tile.has-inprogress-tasks {
   background: #eff6ff;
-  border: 2px solid #93c5fd;
+  border: 2px solid #3b82f6;
 }
 
 .react-calendar__tile.has-completed-tasks {
   background: #f0fdf4;
-  border: 2px solid #86efac;
+  border: 2px solid #10b981;
 }
 
 /* タスクインジケーター */
@@ -1045,7 +1045,7 @@ body {
 }
 
 .task-indicator.pending {
-  background: #ef4444;
+  background: #f59e0b;
 }
 
 .task-indicator.in_progress {
@@ -1097,7 +1097,7 @@ body {
 }
 
 .tooltip-task.status-pending .task-status-dot {
-  background: #ef4444;
+  background: #f59e0b;
 }
 
 .tooltip-task.status-in_progress .task-status-dot {
@@ -1137,7 +1137,7 @@ body {
 }
 
 .legend-color.pending {
-  background: #ef4444;
+  background: #f59e0b;
 }
 
 .legend-color.in_progress {
