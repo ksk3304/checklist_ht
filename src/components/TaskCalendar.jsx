@@ -134,25 +134,21 @@ function TaskCalendar({ tasks }) {
                   const tooltipWidth = 250
                   const mouseY = e.clientY
                   
-                  // 左右の配置を決定
+                  // 左右の配置を決定（カレンダーのすぐ隣）
                   const spaceOnRight = screenWidth - calendarRect.right
-                  const isRightSide = spaceOnRight >= tooltipWidth / 2
-                  
-                  // 上下の配置を決定（画面の半分より上か下か）
-                  const isUpperHalf = mouseY < screenHeight / 2
                   
                   let x, y
                   
-                  if (isRightSide) {
-                    // 右側：カレンダーのすぐ隣
-                    x = calendarRect.right + 5
+                  if (spaceOnRight >= tooltipWidth + 20) {
+                    // 右側：カレンダーのすぐ隣（ほぼ接触）
+                    x = calendarRect.right + 2
                   } else {
-                    // 左側：カレンダーのすぐ隣
-                    x = calendarRect.left - tooltipWidth - 5
+                    // 左側：カレンダーのすぐ隣（ほぼ接触）
+                    x = calendarRect.left - tooltipWidth - 2
                   }
                   
-                  // 縦位置はマウス位置に近く
-                  y = mouseY - 50
+                  // 縦位置はカレンダーの中央あたり
+                  y = calendarRect.top + 100
                   
                   setTooltipPosition({ x, y })
                 }
