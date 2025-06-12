@@ -1027,6 +1027,12 @@ body {
   cursor: pointer;
 }
 
+.react-calendar__tile.has-pending-tasks:hover,
+.react-calendar__tile.has-inprogress-tasks:hover,
+.react-calendar__tile.has-completed-tasks:hover {
+  background: #f1f5f9 !important;
+}
+
 .react-calendar__tile:hover {
   background: #f1f5f9;
 }

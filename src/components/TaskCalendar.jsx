@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
 
@@ -6,6 +6,7 @@ function TaskCalendar({ tasks }) {
   const [selectedDate, setSelectedDate] = useState(null)
   const [hoveredDate, setHoveredDate] = useState(null)
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+  const calendarRef = useRef(null)
 
   // タスクの期限日付をグループ化
   const tasksByDate = useMemo(() => {
@@ -41,29 +42,17 @@ function TaskCalendar({ tasks }) {
         return (
           <div className="calendar-task-indicators">
             {statusCounts.pending && (
-              <div 
-                className="task-indicator pending"
-                onMouseEnter={(e) => handleTileHover(e, date)}
-                onMouseLeave={handleTileLeave}
-              >
+              <div className="task-indicator pending">
                 {statusCounts.pending}
               </div>
             )}
             {statusCounts.in_progress && (
-              <div 
-                className="task-indicator in_progress"
-                onMouseEnter={(e) => handleTileHover(e, date)}
-                onMouseLeave={handleTileLeave}
-              >
+              <div className="task-indicator in_progress">
                 {statusCounts.in_progress}
               </div>
             )}
             {statusCounts.completed && (
-              <div 
-                className="task-indicator completed"
-                onMouseEnter={(e) => handleTileHover(e, date)}
-                onMouseLeave={handleTileLeave}
-              >
+              <div className="task-indicator completed">
                 {statusCounts.completed}
               </div>
             )}
@@ -113,12 +102,62 @@ function TaskCalendar({ tasks }) {
     setHoveredDate(null)
   }
 
+  useEffect(() => {
+    const calendar = calendarRef.current
+    if (!calendar) return
+
+    const handleMouseMove = (e) => {
+      const tile = e.target.closest('.react-calendar__tile')
+      if (tile) {
+        const dateStr = tile.getAttribute('aria-label')
+        if (dateStr) {
+          try {
+            const match = dateStr.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/)
+            if (match) {
+              const year = parseInt(match[1])
+              const month = parseInt(match[2]) - 1
+              const day = parseInt(match[3])
+              const date = new Date(year, month, day)
+              const dateString = date.toISOString().split('T')[0]
+              
+              if (tasksByDate[dateString]) {
+                setHoveredDate(dateString)
+                setTooltipPosition({
+                  x: e.clientX + 10,
+                  y: e.clientY - 80
+                })
+              } else {
+                setHoveredDate(null)
+              }
+            }
+          } catch (error) {
+            setHoveredDate(null)
+          }
+        }
+      } else {
+        setHoveredDate(null)
+      }
+    }
+
+    const handleMouseLeave = () => {
+      setHoveredDate(null)
+    }
+
+    calendar.addEventListener('mousemove', handleMouseMove)
+    calendar.addEventListener('mouseleave', handleMouseLeave)
+
+    return () => {
+      calendar.removeEventListener('mousemove', handleMouseMove)
+      calendar.removeEventListener('mouseleave', handleMouseLeave)
+    }
+  }, [tasksByDate])
+
 
   return (
     <div className="task-calendar-container">
       <h3 className="calendar-title">タスクカレンダー</h3>
       
-      <div className="calendar-wrapper">
+      <div className="calendar-wrapper" ref={calendarRef}>
         <Calendar
           value={selectedDate}
           onChange={setSelectedDate}
