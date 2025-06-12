@@ -19,6 +19,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import TaskCalendar from './TaskCalendar'
 
 function TaskList({ session }) {
   const { projectId } = useParams()
@@ -513,6 +514,8 @@ function TaskList({ session }) {
           </DndContext>
         )}
       </div>
+
+      <TaskCalendar tasks={tasks} />
     </div>
   )
 }

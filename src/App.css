@@ -923,6 +923,231 @@ body {
   background: #4b5563;
 }
 
+/* Task Calendar styles */
+.task-calendar-container {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-top: 2rem;
+}
+
+.calendar-title {
+  color: #2563eb;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.calendar-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+/* React Calendar カスタマイズ */
+.react-calendar {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  max-width: 500px;
+}
+
+.react-calendar__navigation {
+  background: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.react-calendar__navigation button {
+  color: #374151;
+  font-size: 1rem;
+  background: none;
+  border: none;
+  padding: 0.75rem;
+}
+
+.react-calendar__navigation button:hover {
+  background: #e5e7eb;
+}
+
+.react-calendar__month-view__weekdays {
+  background: #f1f5f9;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 0.5rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.react-calendar__tile {
+  position: relative;
+  padding: 0.5rem 0.25rem;
+  background: none;
+  border: none;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.react-calendar__tile:hover {
+  background: #f1f5f9;
+}
+
+.react-calendar__tile--active {
+  background: #2563eb !important;
+  color: white;
+}
+
+.react-calendar__tile--now {
+  background: #fef3c7;
+}
+
+/* タスクがある日付のスタイル */
+.react-calendar__tile.has-pending-tasks {
+  background: #fef2f2;
+  border: 2px solid #fca5a5;
+}
+
+.react-calendar__tile.has-inprogress-tasks {
+  background: #eff6ff;
+  border: 2px solid #93c5fd;
+}
+
+.react-calendar__tile.has-completed-tasks {
+  background: #f0fdf4;
+  border: 2px solid #86efac;
+}
+
+/* タスクインジケーター */
+.calendar-task-indicators {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.task-indicator {
+  font-size: 0.7rem;
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: white;
+  font-weight: bold;
+  min-width: 12px;
+  text-align: center;
+}
+
+.task-indicator.pending {
+  background: #ef4444;
+}
+
+.task-indicator.in_progress {
+  background: #3b82f6;
+}
+
+.task-indicator.completed {
+  background: #10b981;
+}
+
+/* ツールチップ */
+.calendar-tooltip {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  padding: 0.75rem;
+  max-width: 250px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.tooltip-header {
+  font-weight: bold;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tooltip-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tooltip-task {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.task-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tooltip-task.status-pending .task-status-dot {
+  background: #ef4444;
+}
+
+.tooltip-task.status-in_progress .task-status-dot {
+  background: #3b82f6;
+}
+
+.tooltip-task.status-completed .task-status-dot {
+  background: #10b981;
+}
+
+.task-title {
+  color: #374151;
+}
+
+/* 凡例 */
+.calendar-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legend-color.pending {
+  background: #ef4444;
+}
+
+.legend-color.in_progress {
+  background: #3b82f6;
+}
+
+.legend-color.completed {
+  background: #10b981;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .app-header {
