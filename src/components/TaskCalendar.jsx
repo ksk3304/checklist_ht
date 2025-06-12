@@ -136,22 +136,16 @@ function TaskCalendar({ tasks }) {
                   const spaceOnRight = screenWidth - calendarRect.right
                   const spaceOnLeft = calendarRect.left
                   
-                  if (spaceOnRight >= tooltipWidth + 20) {
-                    // 右側に表示
+                  if (spaceOnRight >= tooltipWidth) {
+                    // 右側に表示（カレンダーと少し被るくらい）
                     setTooltipPosition({
-                      x: calendarRect.right + 15,
-                      y: calendarRect.top + 50
-                    })
-                  } else if (spaceOnLeft >= tooltipWidth + 20) {
-                    // 左側に表示
-                    setTooltipPosition({
-                      x: calendarRect.left - tooltipWidth - 15,
+                      x: calendarRect.right - 50,
                       y: calendarRect.top + 50
                     })
                   } else {
-                    // どちらも狭い場合は右側（スクロール可能）
+                    // 左側に表示（カレンダーと少し被るくらい）
                     setTooltipPosition({
-                      x: calendarRect.right + 15,
+                      x: calendarRect.left - tooltipWidth + 50,
                       y: calendarRect.top + 50
                     })
                   }
