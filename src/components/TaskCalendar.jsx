@@ -149,8 +149,16 @@ function TaskCalendar({ tasks }) {
                     x = calendarRect.left - tooltipWidth - 5
                   }
                   
-                  // 縦位置はカレンダーの中央あたり
-                  y = calendarRect.top + 100
+                  // 縦位置はマウスの上下位置を加味
+                  const screenHeight = window.innerHeight
+                  
+                  if (mouseY < screenHeight / 2) {
+                    // 上半分：カレンダーの上部寄り
+                    y = calendarRect.top + 50
+                  } else {
+                    // 下半分：カレンダーの下部寄り
+                    y = calendarRect.bottom - 120
+                  }
                   
                   setTooltipPosition({ x, y })
                 }
