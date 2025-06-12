@@ -144,20 +144,15 @@ function TaskCalendar({ tasks }) {
                   let x, y
                   
                   if (isRightSide) {
-                    // 右側：カレンダーと10px重なって表示
-                    x = calendarRect.right - 10
+                    // 右側：カレンダーのすぐ隣
+                    x = calendarRect.right + 5
                   } else {
-                    // 左側：カレンダーと10px重なって表示
-                    x = calendarRect.left - tooltipWidth + 10
+                    // 左側：カレンダーのすぐ隣
+                    x = calendarRect.left - tooltipWidth - 5
                   }
                   
-                  if (isUpperHalf) {
-                    // 上半分：カレンダーの上部に合わせて表示
-                    y = calendarRect.top + 20
-                  } else {
-                    // 下半分：カレンダーの下部に合わせて表示
-                    y = calendarRect.bottom - 140
-                  }
+                  // 縦位置はマウス位置に近く
+                  y = mouseY - 50
                   
                   setTooltipPosition({ x, y })
                 }
