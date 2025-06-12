@@ -45,6 +45,7 @@ function TaskList({ session }) {
         .select('*')
         .eq('project_id', projectId)
         .order('due_date', { ascending: true })
+        .order('display_order', { ascending: true })
       
       if (filter !== 'all') {
         query = query.eq('status', filter)
@@ -63,6 +64,16 @@ function TaskList({ session }) {
   const createTask = async (e) => {
     e.preventDefault()
     try {
+      // 最大のdisplay_orderを取得
+      const { data: maxOrderData } = await supabase
+        .from('tasks')
+        .select('display_order')
+        .eq('project_id', projectId)
+        .order('display_order', { ascending: false })
+        .limit(1)
+      
+      const maxOrder = maxOrderData?.[0]?.display_order || 0
+      
       const { error } = await supabase.from('tasks').insert([
         {
           title: newTask.title,
@@ -70,7 +81,8 @@ function TaskList({ session }) {
           due_date: newTask.due_date || null,
           created_by: session.user.id,
           assigned_to: session.user.id,
-          project_id: projectId
+          project_id: projectId,
+          display_order: maxOrder + 10
         }
       ])
       if (error) throw error
@@ -178,6 +190,43 @@ function TaskList({ session }) {
       title: project.memo_title || '', 
       content: project.memo_content || '' 
     })
+  }
+
+  const moveTask = async (taskId, direction) => {
+    const taskIndex = tasks.findIndex(t => t.id === taskId)
+    if (taskIndex === -1) return
+    
+    const targetIndex = direction === 'up' ? taskIndex - 1 : taskIndex + 1
+    if (targetIndex < 0 || targetIndex >= tasks.length) return
+    
+    const currentTask = tasks[taskIndex]
+    const targetTask = tasks[targetIndex]
+    
+    // 同じ日付の場合のみ入れ替え可能
+    if (currentTask.due_date !== targetTask.due_date) {
+      alert('異なる期限のタスクは入れ替えできません')
+      return
+    }
+    
+    try {
+      // display_orderを入れ替え
+      const tempOrder = currentTask.display_order
+      
+      await supabase
+        .from('tasks')
+        .update({ display_order: targetTask.display_order })
+        .eq('id', currentTask.id)
+      
+      await supabase
+        .from('tasks')
+        .update({ display_order: tempOrder })
+        .eq('id', targetTask.id)
+      
+      fetchTasks()
+    } catch (error) {
+      console.error('Error moving task:', error)
+      alert('タスクの移動に失敗しました')
+    }
   }
 
   if (loading) return <div>タスクを読み込み中...</div>
@@ -348,6 +397,22 @@ function TaskList({ session }) {
                 <p className="task-due">期限: {new Date(task.due_date).toLocaleDateString('ja-JP')}</p>
               )}
               <div className="task-actions">
+                <button 
+                  className="move-btn"
+                  onClick={() => moveTask(task.id, 'up')}
+                  disabled={tasks.findIndex(t => t.id === task.id) === 0}
+                  title="上に移動"
+                >
+                  ↑
+                </button>
+                <button 
+                  className="move-btn"
+                  onClick={() => moveTask(task.id, 'down')}
+                  disabled={tasks.findIndex(t => t.id === task.id) === tasks.length - 1}
+                  title="下に移動"
+                >
+                  ↓
+                </button>
                 <button 
                   className="edit-btn"
                   onClick={() => startEditing(task)}

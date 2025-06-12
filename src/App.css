@@ -542,6 +542,28 @@ body {
   background: #d97706;
 }
 
+.move-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: bold;
+  min-width: 30px;
+}
+
+.move-btn:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.move-btn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 /* Memo section styles */
 .memo-section {
   background: white;
