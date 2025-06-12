@@ -127,23 +127,32 @@ function TaskCalendar({ tasks }) {
               if (tasksByDate[dateString]) {
                 if (hoveredDate !== dateString) {
                   setHoveredDate(dateString)
-                  // カレンダーの位置とマウス位置から最適な場所を決定
+                  // カレンダーの位置から最適な横位置を決定
                   const calendarRect = e.currentTarget.getBoundingClientRect()
-                  const screenHeight = window.innerHeight
-                  const mouseY = e.clientY
+                  const screenWidth = window.innerWidth
+                  const tooltipWidth = 250
                   
-                  // 画面の半分より上にマウスがある場合は下に、下にある場合は上に表示
-                  if (mouseY < screenHeight / 2) {
-                    // 上半分：カレンダーの下に表示
+                  // 画面右側に十分なスペースがあるかチェック
+                  const spaceOnRight = screenWidth - calendarRect.right
+                  const spaceOnLeft = calendarRect.left
+                  
+                  if (spaceOnRight >= tooltipWidth + 20) {
+                    // 右側に表示
                     setTooltipPosition({
-                      x: calendarRect.right - 280,
-                      y: calendarRect.bottom + 10
+                      x: calendarRect.right + 15,
+                      y: calendarRect.top + 50
+                    })
+                  } else if (spaceOnLeft >= tooltipWidth + 20) {
+                    // 左側に表示
+                    setTooltipPosition({
+                      x: calendarRect.left - tooltipWidth - 15,
+                      y: calendarRect.top + 50
                     })
                   } else {
-                    // 下半分：カレンダーの上に表示
+                    // どちらも狭い場合は右側（スクロール可能）
                     setTooltipPosition({
-                      x: calendarRect.right - 280,
-                      y: calendarRect.top - 150
+                      x: calendarRect.right + 15,
+                      y: calendarRect.top + 50
                     })
                   }
                 }
