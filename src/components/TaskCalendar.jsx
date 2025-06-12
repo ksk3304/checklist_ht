@@ -103,44 +103,58 @@ function TaskCalendar({ tasks }) {
     <div className="task-calendar-container">
       <h3 className="calendar-title">タスクカレンダー</h3>
       
-      <div className="calendar-wrapper">
-        <div
-          onMouseLeave={handleTileLeave}
-          onMouseMove={(e) => {
-            // カレンダータイル上でマウス移動時の処理
-            const tile = e.target.closest('.react-calendar__tile')
-            if (tile) {
-              const ariaLabel = tile.getAttribute('aria-label')
-              if (ariaLabel) {
-                try {
-                  const dateMatch = ariaLabel.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/)
-                  if (dateMatch) {
-                    const year = dateMatch[1]
-                    const month = dateMatch[2].padStart(2, '0')
-                    const day = dateMatch[3].padStart(2, '0')
-                    const date = new Date(`${year}-${month}-${day}`)
-                    handleTileHover(e, date)
-                  }
-                } catch (error) {
-                  // 日付解析エラーは無視
-                }
+      <div 
+        className="calendar-wrapper"
+        onMouseLeave={handleTileLeave}
+      >
+        <Calendar
+          value={selectedDate}
+          onChange={setSelectedDate}
+          tileContent={({ date, view }) => {
+            if (view === 'month') {
+              const dateString = date.toISOString().split('T')[0]
+              const tasksOnDate = tasksByDate[dateString]
+              
+              if (tasksOnDate && tasksOnDate.length > 0) {
+                // ステータス別のカウント
+                const statusCounts = tasksOnDate.reduce((acc, task) => {
+                  acc[task.status] = (acc[task.status] || 0) + 1
+                  return acc
+                }, {})
+
+                return (
+                  <div 
+                    className="calendar-task-indicators"
+                    onMouseEnter={(e) => handleTileHover(e, date)}
+                  >
+                    {statusCounts.pending && (
+                      <div className="task-indicator pending" title={`未完了: ${statusCounts.pending}件`}>
+                        {statusCounts.pending}
+                      </div>
+                    )}
+                    {statusCounts.in_progress && (
+                      <div className="task-indicator in_progress" title={`進行中: ${statusCounts.in_progress}件`}>
+                        {statusCounts.in_progress}
+                      </div>
+                    )}
+                    {statusCounts.completed && (
+                      <div className="task-indicator completed" title={`完了: ${statusCounts.completed}件`}>
+                        {statusCounts.completed}
+                      </div>
+                    )}
+                  </div>
+                )
               }
             }
+            return null
           }}
-        >
-          <Calendar
-            value={selectedDate}
-            onChange={setSelectedDate}
-            tileContent={tileContent}
-            tileClassName={tileClassName}
-            locale="ja-JP"
-            calendarType="US"
-            formatShortWeekday={(locale, date) => {
-              const weekdays = ['日', '月', '火', '水', '木', '金', '土']
-              return weekdays[date.getDay()]
-            }}
-          />
-        </div>
+          tileClassName={tileClassName}
+          locale="ja-JP"
+          formatShortWeekday={(locale, date) => {
+            const weekdays = ['日', '月', '火', '水', '木', '金', '土']
+            return weekdays[date.getDay()]
+          }}
+        />
       </div>
 
       {/* ツールチップ */}

@@ -591,13 +591,18 @@ body {
 }
 
 .toggle-arrow {
-  font-size: 1.2rem;
-  color: #6b7280;
+  font-size: 1.5rem;
+  color: #9ca3af;
   transition: transform 0.2s ease;
+  font-weight: bold;
 }
 
 .toggle-arrow.open {
   transform: rotate(180deg);
+}
+
+.section-header:hover .toggle-arrow {
+  color: #6b7280;
 }
 
 /* Memo section styles */
@@ -1083,6 +1088,7 @@ body {
 
 /* ツールチップ */
 .calendar-tooltip {
+  position: fixed;
   background: white;
   border: 1px solid #d1d5db;
   border-radius: 6px;

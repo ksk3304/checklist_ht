@@ -331,7 +331,7 @@ function TaskList({ session }) {
       <div className="memo-section">
         <div className="section-header" onClick={() => setShowMemoForm(!showMemoForm)}>
           <h3 className="memo-section-title">備忘録</h3>
-          <span className={`toggle-arrow ${showMemoForm ? 'open' : ''}`}>▽</span>
+          <span className={`toggle-arrow ${showMemoForm ? 'open' : ''}`}>▾</span>
         </div>
         
         {showMemoForm && (
@@ -457,7 +457,7 @@ function TaskList({ session }) {
         <div className="task-form">
           <div className="section-header" onClick={() => setShowTaskForm(!showTaskForm)}>
             <h3>新しいタスクを追加</h3>
-            <span className={`toggle-arrow ${showTaskForm ? 'open' : ''}`}>▽</span>
+            <span className={`toggle-arrow ${showTaskForm ? 'open' : ''}`}>▾</span>
           </div>
           
           {showTaskForm && (
