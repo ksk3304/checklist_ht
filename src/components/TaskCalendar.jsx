@@ -125,11 +125,15 @@ function TaskCalendar({ tasks }) {
               const dateString = date.toISOString().split('T')[0]
               
               if (tasksByDate[dateString]) {
-                setHoveredDate(dateString)
-                setTooltipPosition({
-                  x: e.clientX + 10,
-                  y: e.clientY - 80
-                })
+                if (hoveredDate !== dateString) {
+                  setHoveredDate(dateString)
+                  // カレンダーの右下に固定位置でツールチップを表示
+                  const calendarRect = e.currentTarget.getBoundingClientRect()
+                  setTooltipPosition({
+                    x: calendarRect.right - 280,
+                    y: calendarRect.bottom + 10
+                  })
+                }
               } else {
                 setHoveredDate(null)
               }
