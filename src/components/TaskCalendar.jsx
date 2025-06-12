@@ -39,7 +39,11 @@ function TaskCalendar({ tasks }) {
         }, {})
 
         return (
-          <div className="calendar-task-indicators">
+          <div 
+            className="calendar-task-indicators"
+            onMouseEnter={(e) => handleTileHover(e, date)}
+            onMouseLeave={handleTileLeave}
+          >
             {statusCounts.pending && (
               <div className="task-indicator pending" title={`未完了: ${statusCounts.pending}件`}>
                 {statusCounts.pending}
@@ -101,48 +105,6 @@ function TaskCalendar({ tasks }) {
     setHoveredDate(null)
   }
 
-  // カレンダーのマウスイベントリスナーを追加
-  useEffect(() => {
-    const handleMouseMove = (event) => {
-      const tile = event.target.closest('.react-calendar__tile')
-      if (tile) {
-        const button = tile.querySelector('abbr')
-        if (button) {
-          const dateStr = tile.getAttribute('aria-label')
-          if (dateStr) {
-            try {
-              // aria-labelから日付を解析
-              const match = dateStr.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/)
-              if (match) {
-                const year = parseInt(match[1])
-                const month = parseInt(match[2]) - 1 // Dateオブジェクトでは月は0から始まる
-                const day = parseInt(match[3])
-                const date = new Date(year, month, day)
-                handleTileHover(event, date)
-              }
-            } catch (error) {
-              console.error('Date parsing error:', error)
-            }
-          }
-        }
-      }
-    }
-
-    const handleMouseLeave = () => {
-      setHoveredDate(null)
-    }
-
-    const calendarWrapper = document.querySelector('.calendar-wrapper')
-    if (calendarWrapper) {
-      calendarWrapper.addEventListener('mousemove', handleMouseMove)
-      calendarWrapper.addEventListener('mouseleave', handleMouseLeave)
-      
-      return () => {
-        calendarWrapper.removeEventListener('mousemove', handleMouseMove)
-        calendarWrapper.removeEventListener('mouseleave', handleMouseLeave)
-      }
-    }
-  }, [tasksByDate])
 
   return (
     <div className="task-calendar-container">
