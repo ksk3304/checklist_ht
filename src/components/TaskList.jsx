@@ -1,6 +1,24 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import {
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 function TaskList({ session }) {
   const { projectId } = useParams()
@@ -9,8 +27,10 @@ function TaskList({ session }) {
   const [newTask, setNewTask] = useState({ title: '', description: '', due_date: '' })
   const [editingTask, setEditingTask] = useState(null)
   const [project, setProject] = useState(null)
-  const [editingMemo, setEditingMemo] = useState(false)
-  const [memoForm, setMemoForm] = useState({ title: '', content: '' })
+  const [memos, setMemos] = useState([])
+  const [newMemo, setNewMemo] = useState({ title: '', content: '' })
+  const [editingMemo, setEditingMemo] = useState(null)
+  const [editingMemoData, setEditingMemoData] = useState({ title: '', content: '' })
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all') // all, pending, in_progress, completed
 
@@ -18,6 +38,7 @@ function TaskList({ session }) {
     if (projectId) {
       fetchProject()
       fetchTasks()
+      fetchMemos()
     }
   }, [projectId, filter])
 
@@ -31,7 +52,6 @@ function TaskList({ session }) {
       
       if (error) throw error
       setProject(data)
-      setMemoForm({ title: data.memo_title || '', content: data.memo_content || '' })
     } catch (error) {
       console.error('Error fetching project:', error)
       navigate('/')
@@ -153,77 +173,134 @@ function TaskList({ session }) {
     }
   }
 
-  const startEditingMemo = () => {
-    setEditingMemo(true)
-    setMemoForm({ 
-      title: project.memo_title || '', 
-      content: project.memo_content || '' 
-    })
-  }
-
-  const saveMemo = async (e) => {
-    e.preventDefault()
+  const fetchMemos = async () => {
     try {
-      const { error } = await supabase
-        .from('projects')
-        .update({
-          memo_title: memoForm.title,
-          memo_content: memoForm.content
-        })
-        .eq('id', projectId)
+      const { data, error } = await supabase
+        .from('project_memos')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('display_order', { ascending: true })
       
       if (error) throw error
-      
-      setEditingMemo(false)
-      fetchProject()
+      setMemos(data || [])
     } catch (error) {
-      console.error('Error saving memo:', error)
-      alert('メモの保存に失敗しました')
+      console.error('Error fetching memos:', error)
     }
   }
 
-  const cancelEditingMemo = () => {
-    setEditingMemo(false)
-    setMemoForm({ 
-      title: project.memo_title || '', 
-      content: project.memo_content || '' 
-    })
-  }
-
-  const moveTask = async (taskId, direction) => {
-    const taskIndex = tasks.findIndex(t => t.id === taskId)
-    if (taskIndex === -1) return
-    
-    const targetIndex = direction === 'up' ? taskIndex - 1 : taskIndex + 1
-    if (targetIndex < 0 || targetIndex >= tasks.length) return
-    
-    const currentTask = tasks[taskIndex]
-    const targetTask = tasks[targetIndex]
-    
-    // 同じ日付の場合のみ入れ替え可能
-    if (currentTask.due_date !== targetTask.due_date) {
-      alert('異なる期限のタスクは入れ替えできません')
+  const createMemo = async (e) => {
+    e.preventDefault()
+    if (!newMemo.title.trim() || !newMemo.content.trim()) {
+      alert('タイトルと内容を入力してください')
       return
     }
     
     try {
-      // display_orderを入れ替え
-      const tempOrder = currentTask.display_order
+      const maxOrderData = await supabase
+        .from('project_memos')
+        .select('display_order')
+        .eq('project_id', projectId)
+        .order('display_order', { ascending: false })
+        .limit(1)
       
-      await supabase
-        .from('tasks')
-        .update({ display_order: targetTask.display_order })
-        .eq('id', currentTask.id)
+      const maxOrder = maxOrderData.data?.[0]?.display_order || 0
       
-      await supabase
-        .from('tasks')
-        .update({ display_order: tempOrder })
-        .eq('id', targetTask.id)
+      const { error } = await supabase
+        .from('project_memos')
+        .insert([{
+          project_id: projectId,
+          title: newMemo.title,
+          content: newMemo.content,
+          created_by: session.user.id,
+          display_order: maxOrder + 10
+        }])
       
-      fetchTasks()
+      if (error) throw error
+      
+      setNewMemo({ title: '', content: '' })
+      fetchMemos()
     } catch (error) {
-      console.error('Error moving task:', error)
-      alert('タスクの移動に失敗しました')
+      console.error('Error creating memo:', error)
+      alert('メモの作成に失敗しました')
+    }
+  }
+
+  const updateMemo = async (memoId, updates) => {
+    try {
+      const { error } = await supabase
+        .from('project_memos')
+        .update(updates)
+        .eq('id', memoId)
+      
+      if (error) throw error
+      fetchMemos()
+    } catch (error) {
+      console.error('Error updating memo:', error)
+      alert('メモの更新に失敗しました')
+    }
+  }
+
+  const deleteMemo = async (memoId) => {
+    if (!confirm('このメモを削除しますか？')) return
+    
+    try {
+      const { error } = await supabase
+        .from('project_memos')
+        .delete()
+        .eq('id', memoId)
+      
+      if (error) throw error
+      fetchMemos()
+    } catch (error) {
+      console.error('Error deleting memo:', error)
+      alert('メモの削除に失敗しました')
+    }
+  }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event
+
+    if (active.id !== over.id) {
+      const oldIndex = tasks.findIndex((task) => task.id === active.id)
+      const newIndex = tasks.findIndex((task) => task.id === over.id)
+      
+      const movedTask = tasks[oldIndex]
+      const targetTask = tasks[newIndex]
+      
+      // 同じ日付の場合のみ入れ替え可能
+      if (movedTask.due_date !== targetTask.due_date) {
+        alert('異なる期限のタスクは入れ替えできません')
+        return
+      }
+      
+      const newTasks = arrayMove(tasks, oldIndex, newIndex)
+      setTasks(newTasks) // 即座にUIを更新
+      
+      // データベースを更新
+      try {
+        // 影響を受けるタスクのdisplay_orderを更新
+        const updatePromises = newTasks.map((task, index) => {
+          if (task.display_order !== index * 10) {
+            return supabase
+              .from('tasks')
+              .update({ display_order: index * 10 })
+              .eq('id', task.id)
+          }
+          return null
+        }).filter(Boolean)
+        
+        await Promise.all(updatePromises)
+      } catch (error) {
+        console.error('Error updating task order:', error)
+        fetchTasks() // エラー時は再取得
+      }
     }
   }
 
@@ -245,47 +322,94 @@ function TaskList({ session }) {
       </div>
 
       <div className="memo-section">
-        {editingMemo ? (
-          <div className="memo-edit-form">
-            <h3>メモを編集</h3>
+        <h3 className="memo-section-title">備忘録</h3>
+        
+        <div className="add-memo-form">
+          <form onSubmit={createMemo}>
             <input
               type="text"
-              placeholder="メモのタイトル"
-              value={memoForm.title}
-              onChange={(e) => setMemoForm({ ...memoForm, title: e.target.value })}
-              className="memo-title-input"
+              placeholder="タイトル"
+              value={newMemo.title}
+              onChange={(e) => setNewMemo({ ...newMemo, title: e.target.value })}
+              className="memo-input"
             />
             <textarea
-              placeholder="メモの内容"
-              value={memoForm.content}
-              onChange={(e) => setMemoForm({ ...memoForm, content: e.target.value })}
-              className="memo-content-textarea"
-              rows={5}
+              placeholder="内容"
+              value={newMemo.content}
+              onChange={(e) => setNewMemo({ ...newMemo, content: e.target.value })}
+              className="memo-textarea"
+              rows={3}
             />
-            <div className="memo-actions">
-              <button onClick={(e) => saveMemo(e)} className="save-btn">保存</button>
-              <button onClick={cancelEditingMemo} className="cancel-btn">キャンセル</button>
+            <button type="submit" className="add-memo-btn">追加</button>
+          </form>
+        </div>
+
+        <div className="memos-list">
+          {memos.map((memo) => (
+            <div key={memo.id} className="memo-item">
+              <div className="memo-header">
+                <h4 className="memo-title">{memo.title}</h4>
+                <div className="memo-buttons">
+                  <button
+                    className="memo-edit-btn"
+                    onClick={() => {
+                      setEditingMemo(memo.id)
+                      setEditingMemoData({ title: memo.title, content: memo.content })
+                    }}
+                  >
+                    編集
+                  </button>
+                  <button
+                    className="memo-delete-btn"
+                    onClick={() => deleteMemo(memo.id)}
+                  >
+                    削除
+                  </button>
+                </div>
+              </div>
+              {editingMemo === memo.id ? (
+                <div className="memo-edit-content">
+                  <input
+                    type="text"
+                    value={editingMemoData.title}
+                    onChange={(e) => setEditingMemoData({ ...editingMemoData, title: e.target.value })}
+                    className="memo-input"
+                  />
+                  <textarea
+                    value={editingMemoData.content}
+                    onChange={(e) => setEditingMemoData({ ...editingMemoData, content: e.target.value })}
+                    className="memo-textarea"
+                    rows={3}
+                  />
+                  <div className="memo-edit-actions">
+                    <button
+                      onClick={() => {
+                        updateMemo(memo.id, editingMemoData)
+                        setEditingMemo(null)
+                      }}
+                      className="save-btn"
+                    >
+                      保存
+                    </button>
+                    <button
+                      onClick={() => setEditingMemo(null)}
+                      className="cancel-btn"
+                    >
+                      キャンセル
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p className="memo-content" style={{ whiteSpace: 'pre-wrap' }}>
+                  {memo.content}
+                </p>
+              )}
+              <span className="memo-date">
+                {new Date(memo.created_at).toLocaleDateString('ja-JP')} {new Date(memo.created_at).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+              </span>
             </div>
-          </div>
-        ) : (
-          <div className="memo-view">
-            {(project.memo_title || project.memo_content) ? (
-              <>
-                {project.memo_title && <h3 className="memo-title">{project.memo_title}</h3>}
-                {project.memo_content && (
-                  <p className="memo-content" style={{ whiteSpace: 'pre-wrap' }}>
-                    {project.memo_content}
-                  </p>
-                )}
-              </>
-            ) : (
-              <p className="no-memo">メモはまだありません</p>
-            )}
-            <button onClick={startEditingMemo} className="edit-memo-btn">
-              メモを編集
-            </button>
-          </div>
-        )}
+          ))}
+        </div>
       </div>
       {editingTask ? (
         <div className="task-form edit-form">
@@ -371,62 +495,87 @@ function TaskList({ session }) {
         {tasks.length === 0 ? (
           <p className="no-tasks">タスクがありません</p>
         ) : (
-          tasks.map((task) => (
-            <div key={task.id} className={`task-item status-${task.status}`}>
-              <div className="task-header">
-                <h4>{task.title}</h4>
-                <div className="task-controls">
-                  <select 
-                    value={task.status} 
-                    onChange={(e) => updateTaskStatus(task.id, e.target.value)}
-                  >
-                    <option value="pending">未完了</option>
-                    <option value="in_progress">進行中</option>
-                    <option value="completed">完了</option>
-                  </select>
-                </div>
-              </div>
-              {task.description && (
-                <p className="task-description" style={{ whiteSpace: 'pre-wrap' }}>
-                  {task.description}
-                </p>
-              )}
-              {task.due_date && (
-                <p className="task-due">期限: {new Date(task.due_date).toLocaleDateString('ja-JP')}</p>
-              )}
-              <div className="task-actions">
-                <button 
-                  className="move-btn"
-                  onClick={() => moveTask(task.id, 'up')}
-                  disabled={tasks.findIndex(t => t.id === task.id) === 0}
-                  title="上に移動"
-                >
-                  ↑
-                </button>
-                <button 
-                  className="move-btn"
-                  onClick={() => moveTask(task.id, 'down')}
-                  disabled={tasks.findIndex(t => t.id === task.id) === tasks.length - 1}
-                  title="下に移動"
-                >
-                  ↓
-                </button>
-                <button 
-                  className="edit-btn"
-                  onClick={() => startEditing(task)}
-                >
-                  編集
-                </button>
-                <button 
-                  className="delete-btn"
-                  onClick={() => deleteTask(task.id)}
-                >
-                  削除
-                </button>
-              </div>
-            </div>
-          ))
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={tasks.map(t => t.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {tasks.map((task) => (
+                <SortableTask key={task.id} task={task} startEditing={startEditing} updateTaskStatus={updateTaskStatus} deleteTask={deleteTask} />
+              ))}
+            </SortableContext>
+          </DndContext>
         )}
+      </div>
+    </div>
+  )
+}
+
+function SortableTask({ task, startEditing, updateTaskStatus, deleteTask }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`task-item status-${task.status} ${isDragging ? 'dragging' : ''}`}
+    >
+      <div className="drag-handle" {...attributes} {...listeners}>
+        ☰
+      </div>
+      <div className="task-content">
+        <div className="task-header">
+          <h4>{task.title}</h4>
+          <div className="task-controls">
+            <select 
+              value={task.status} 
+              onChange={(e) => updateTaskStatus(task.id, e.target.value)}
+            >
+              <option value="pending">未完了</option>
+              <option value="in_progress">進行中</option>
+              <option value="completed">完了</option>
+            </select>
+          </div>
+        </div>
+        {task.description && (
+          <p className="task-description" style={{ whiteSpace: 'pre-wrap' }}>
+            {task.description}
+          </p>
+        )}
+        {task.due_date && (
+          <p className="task-due">期限: {new Date(task.due_date).toLocaleDateString('ja-JP')}</p>
+        )}
+        <div className="task-actions">
+          <button 
+            className="edit-btn"
+            onClick={() => startEditing(task)}
+          >
+            編集
+          </button>
+          <button 
+            className="delete-btn"
+            onClick={() => deleteTask(task.id)}
+          >
+            削除
+          </button>
+        </div>
       </div>
     </div>
   )
