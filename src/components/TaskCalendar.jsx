@@ -127,24 +127,26 @@ function TaskCalendar({ tasks }) {
               if (tasksByDate[dateString]) {
                 if (hoveredDate !== dateString) {
                   setHoveredDate(dateString)
-                  // カレンダーとマウス位置から最適な位置を決定
-                  const calendarRect = e.currentTarget.getBoundingClientRect()
+                  // 実際のカレンダー表示部分の位置を取得
+                  const calendarElement = e.currentTarget.querySelector('.react-calendar')
+                  if (!calendarElement) return
+                  
+                  const calendarRect = calendarElement.getBoundingClientRect()
                   const screenWidth = window.innerWidth
-                  const screenHeight = window.innerHeight
                   const tooltipWidth = 250
                   const mouseY = e.clientY
                   
-                  // 左右の配置を決定（カレンダーのすぐ隣）
+                  // 左右の配置を決定（実際のカレンダーのすぐ隣）
                   const spaceOnRight = screenWidth - calendarRect.right
                   
                   let x, y
                   
                   if (spaceOnRight >= tooltipWidth + 20) {
                     // 右側：カレンダーのすぐ隣（ほぼ接触）
-                    x = calendarRect.right + 2
+                    x = calendarRect.right + 5
                   } else {
                     // 左側：カレンダーのすぐ隣（ほぼ接触）
-                    x = calendarRect.left - tooltipWidth - 2
+                    x = calendarRect.left - tooltipWidth - 5
                   }
                   
                   // 縦位置はカレンダーの中央あたり
