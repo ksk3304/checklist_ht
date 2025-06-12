@@ -9,6 +9,8 @@ function TaskList({ session }) {
   const [newTask, setNewTask] = useState({ title: '', description: '', due_date: '' })
   const [editingTask, setEditingTask] = useState(null)
   const [project, setProject] = useState(null)
+  const [editingMemo, setEditingMemo] = useState(false)
+  const [memoForm, setMemoForm] = useState({ title: '', content: '' })
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all') // all, pending, in_progress, completed
 
@@ -29,6 +31,7 @@ function TaskList({ session }) {
       
       if (error) throw error
       setProject(data)
+      setMemoForm({ title: data.memo_title || '', content: data.memo_content || '' })
     } catch (error) {
       console.error('Error fetching project:', error)
       navigate('/')
@@ -41,7 +44,7 @@ function TaskList({ session }) {
         .from('tasks')
         .select('*')
         .eq('project_id', projectId)
-        .order('created_at', { ascending: false })
+        .order('due_date', { ascending: true })
       
       if (filter !== 'all') {
         query = query.eq('status', filter)
@@ -140,6 +143,43 @@ function TaskList({ session }) {
     }
   }
 
+  const startEditingMemo = () => {
+    setEditingMemo(true)
+    setMemoForm({ 
+      title: project.memo_title || '', 
+      content: project.memo_content || '' 
+    })
+  }
+
+  const saveMemo = async (e) => {
+    e.preventDefault()
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .update({
+          memo_title: memoForm.title,
+          memo_content: memoForm.content
+        })
+        .eq('id', projectId)
+      
+      if (error) throw error
+      
+      setEditingMemo(false)
+      fetchProject()
+    } catch (error) {
+      console.error('Error saving memo:', error)
+      alert('メモの保存に失敗しました')
+    }
+  }
+
+  const cancelEditingMemo = () => {
+    setEditingMemo(false)
+    setMemoForm({ 
+      title: project.memo_title || '', 
+      content: project.memo_content || '' 
+    })
+  }
+
   if (loading) return <div>タスクを読み込み中...</div>
   if (!project) return <div>プロジェクトが見つかりません</div>
 
@@ -154,6 +194,50 @@ function TaskList({ session }) {
           <p className="project-description" style={{ whiteSpace: 'pre-wrap' }}>
             {project.description}
           </p>
+        )}
+      </div>
+
+      <div className="memo-section">
+        {editingMemo ? (
+          <div className="memo-edit-form">
+            <h3>メモを編集</h3>
+            <input
+              type="text"
+              placeholder="メモのタイトル"
+              value={memoForm.title}
+              onChange={(e) => setMemoForm({ ...memoForm, title: e.target.value })}
+              className="memo-title-input"
+            />
+            <textarea
+              placeholder="メモの内容"
+              value={memoForm.content}
+              onChange={(e) => setMemoForm({ ...memoForm, content: e.target.value })}
+              className="memo-content-textarea"
+              rows={5}
+            />
+            <div className="memo-actions">
+              <button onClick={(e) => saveMemo(e)} className="save-btn">保存</button>
+              <button onClick={cancelEditingMemo} className="cancel-btn">キャンセル</button>
+            </div>
+          </div>
+        ) : (
+          <div className="memo-view">
+            {(project.memo_title || project.memo_content) ? (
+              <>
+                {project.memo_title && <h3 className="memo-title">{project.memo_title}</h3>}
+                {project.memo_content && (
+                  <p className="memo-content" style={{ whiteSpace: 'pre-wrap' }}>
+                    {project.memo_content}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="no-memo">メモはまだありません</p>
+            )}
+            <button onClick={startEditingMemo} className="edit-memo-btn">
+              メモを編集
+            </button>
+          </div>
         )}
       </div>
       {editingTask ? (

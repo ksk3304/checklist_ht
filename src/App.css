@@ -542,6 +542,220 @@ body {
   background: #d97706;
 }
 
+/* Memo section styles */
+.memo-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+  border-left: 4px solid #8b5cf6;
+}
+
+.memo-edit-form h3 {
+  margin-bottom: 1rem;
+  color: #8b5cf6;
+}
+
+.memo-title-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.memo-content-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 120px;
+  margin-bottom: 1rem;
+}
+
+.memo-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.memo-actions .save-btn {
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.memo-actions .save-btn:hover {
+  background: #7c3aed;
+}
+
+.memo-actions .cancel-btn {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.memo-actions .cancel-btn:hover {
+  background: #4b5563;
+}
+
+.memo-view {
+  position: relative;
+}
+
+.memo-title {
+  color: #8b5cf6;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.memo-content {
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.no-memo {
+  color: #9ca3af;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.edit-memo-btn {
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.edit-memo-btn:hover {
+  background: #7c3aed;
+}
+
+/* Memo section styles */
+.memo-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+  border-left: 4px solid #8b5cf6;
+}
+
+.memo-view {
+  position: relative;
+}
+
+.memo-title {
+  color: #7c3aed;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.memo-content {
+  color: #4b5563;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.no-memo {
+  color: #9ca3af;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.edit-memo-btn {
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.edit-memo-btn:hover {
+  background: #7c3aed;
+}
+
+.memo-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.memo-edit-form h3 {
+  color: #7c3aed;
+  margin: 0;
+}
+
+.memo-title-input,
+.memo-content-textarea {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.memo-title-input:focus,
+.memo-content-textarea:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.memo-content-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.memo-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.memo-actions .save-btn {
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.memo-actions .save-btn:hover {
+  background: #7c3aed;
+}
+
+.memo-actions .cancel-btn {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.memo-actions .cancel-btn:hover {
+  background: #4b5563;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .app-header {
