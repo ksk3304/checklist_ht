@@ -8,6 +8,7 @@ const ProfessionalGanttChart = () => {
   const [displayStartDate, setDisplayStartDate] = useState('');
   const [displayEndDate, setDisplayEndDate] = useState('');
   const [newTask, setNewTask] = useState({ task_name: '', member: '', start_date: '', end_date: '' });
+  const [showExtraColumns, setShowExtraColumns] = useState(false);
 
   // Supabase設定
   const supabase = createClient(
@@ -307,26 +308,51 @@ const ProfessionalGanttChart = () => {
       </div>
 
       {/* メインガントチャート */}
-      <div className="gantt-container-improved">
+      <div className="gantt-container-improved" style={{ maxHeight: '70vh' }}>
         {/* 左側固定エリア */}
-        <div className="gantt-fixed-left">
+        <div className="gantt-fixed-left" style={{ width: showExtraColumns ? '420px' : '220px' }}>
           {/* ヘッダー */}
           <div className="gantt-header-fixed">
-            <div className="gantt-task-column-fixed">タスク</div>
-            <div className="gantt-member-column-fixed">担当者</div>
-            <div className="gantt-actions-column-fixed">操作</div>
+            <div className="gantt-task-column-fixed" style={{ width: '200px' }}>
+              タスク
+              <button 
+                onClick={() => setShowExtraColumns(!showExtraColumns)}
+                style={{
+                  marginLeft: '10px',
+                  padding: '2px 8px',
+                  fontSize: '12px',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                {showExtraColumns ? '<<' : '>>'}
+              </button>
+            </div>
+            {showExtraColumns && (
+              <>
+                <div className="gantt-member-column-fixed">担当者</div>
+                <div className="gantt-actions-column-fixed">操作</div>
+              </>
+            )}
           </div>
 
           {/* タスクリスト */}
           <div className="gantt-body-fixed">
             {tasks.map((task, index) => (
               <div key={task.id} className="gantt-row-fixed" data-task-id={task.id} data-task-index={index}>
-                <div className="gantt-task-name-fixed">{task.task_name}</div>
-                <div className="gantt-member-cell-fixed">{task.member || ''}</div>
-                <div className="gantt-actions-cell-fixed">
-                  <button className="gantt-delete-btn-new" onClick={() => deleteTask(task.id)} title="削除">×</button>
-                  <div className="gantt-drag-handle" data-task-id={task.id} title="ドラッグして順序変更">::</div>
-                </div>
+                <div className="gantt-task-name-fixed" style={{ width: '200px' }}>{task.task_name}</div>
+                {showExtraColumns && (
+                  <>
+                    <div className="gantt-member-cell-fixed">{task.member || ''}</div>
+                    <div className="gantt-actions-cell-fixed">
+                      <button className="gantt-delete-btn-new" onClick={() => deleteTask(task.id)} title="削除">×</button>
+                      <div className="gantt-drag-handle" data-task-id={task.id} title="ドラッグして順序変更">::</div>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
