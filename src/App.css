@@ -1196,6 +1196,235 @@ body {
   margin-top: 2rem;
 }
 
+/* 改善されたガントチャートスタイル（参考コード準拠） */
+.gantt-scroll-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 4px;
+}
+
+.gantt-scroll-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.gantt-scroll-btn:hover {
+  background: #1d4ed8;
+}
+
+.gantt-scroll-info {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.gantt-container-improved {
+  display: flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.gantt-fixed-left {
+  background: #f9fafb;
+  border-right: 2px solid #d1d5db;
+  flex-shrink: 0;
+}
+
+.gantt-header-fixed {
+  display: flex;
+  background: #e5e7eb;
+  border-bottom: 1px solid #d1d5db;
+  font-weight: bold;
+  height: 60px;
+}
+
+.gantt-task-column-fixed {
+  width: 200px;
+  padding: 0.75rem;
+  border-right: 1px solid #d1d5db;
+  display: flex;
+  align-items: center;
+}
+
+.gantt-member-column-fixed {
+  width: 150px;
+  padding: 0.75rem;
+  border-right: 1px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.gantt-actions-column-fixed {
+  width: 80px;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gantt-body-fixed {
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.gantt-row-fixed {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  min-height: 50px;
+}
+
+.gantt-task-name-fixed {
+  width: 200px;
+  padding: 0.75rem;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.gantt-member-cell-fixed {
+  width: 150px;
+  padding: 0.75rem;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.gantt-actions-cell-fixed {
+  width: 80px;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.gantt-delete-btn-new {
+  background: #ef4444;
+  color: white;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gantt-delete-btn-new:hover {
+  background: #dc2626;
+}
+
+.gantt-drag-handle {
+  background: #6b7280;
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  cursor: grab;
+  font-size: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gantt-drag-handle:active {
+  cursor: grabbing;
+}
+
+.gantt-scrollable-right {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.gantt-date-header {
+  display: flex;
+  background: #f1f5f9;
+  border-bottom: 1px solid #d1d5db;
+  height: 60px;
+  overflow: hidden;
+}
+
+.gantt-day-improved {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #e5e7eb;
+  padding: 0.25rem;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  background: #f9fafb;
+}
+
+.gantt-day-improved.weekend {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.gantt-day-improved.today {
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: bold;
+}
+
+.date-top {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.date-bottom {
+  font-size: 0.6rem;
+  color: #6b7280;
+}
+
+.gantt-bars-container {
+  background: white;
+  min-height: 400px;
+  overflow: hidden;
+}
+
+.gantt-task-row {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.gantt-bar-improved {
+  background: linear-gradient(135deg, #4285f4, #1976d2);
+  border: 1px solid #1565c0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+}
+
+.gantt-bar-improved:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transform: translateY(-1px);
+}
+
+.gantt-bar-text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
 .gantt-title {
   color: #333;
   margin-bottom: 1.5rem;
@@ -1359,6 +1588,8 @@ body {
   flex: 1;
   min-width: 800px;
   position: relative;
+  height: 50px;
+  border-right: 1px solid #e5e7eb;
 }
 
 .timeline-dates {
@@ -1368,27 +1599,54 @@ body {
 
 .date-cell {
   flex: 1;
-  padding: 0.5rem;
+  min-width: 50px;
+  padding: 0.25rem;
   border-right: 1px solid #e5e7eb;
   text-align: center;
   font-size: 0.7rem;
   line-height: 1.2;
+  white-space: nowrap;
+  background: #f9fafb;
+}
+
+.date-cell.weekend {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.date-cell.today {
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: bold;
+}
+
+.date-top {
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.date-bottom {
+  font-size: 0.6rem;
+  color: #6b7280;
 }
 
 .task-bar {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 10px;
   height: 30px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
+  background: linear-gradient(135deg, #4285f4, #1976d2);
+  border: 1px solid #1565c0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 1;
 }
 
 .delete-task-btn {
