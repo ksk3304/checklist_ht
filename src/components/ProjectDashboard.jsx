@@ -123,15 +123,20 @@ function ProjectDashboard({ session }) {
     let current = new Date(start)
     while (current <= end) {
       dates.push(new Date(current))
-      if (scale === 'small') {
-        current.setDate(current.getDate() + 7) // 週単位
-      } else if (scale === 'large') {
-        current.setDate(current.getDate() + 1) // 日単位
-      } else {
-        current.setDate(current.getDate() + 3) // 3日単位
-      }
+      current.setDate(current.getDate() + 1) // 常に日単位で生成
     }
-    return dates
+    
+    // スケールに応じてフィルタリング
+    if (scale === 'small') {
+      // 小（3ヶ月）: 週単位表示
+      return dates.filter((date, index) => index % 7 === 0)
+    } else if (scale === 'large') {
+      // 大（詳細）: 全日表示
+      return dates
+    } else {
+      // 中（1ヶ月）: 3日単位表示
+      return dates.filter((date, index) => index % 3 === 0)
+    }
   }
 
   // タスクバーの位置とサイズを計算
@@ -141,16 +146,21 @@ function ProjectDashboard({ session }) {
     const taskStart = new Date(task.startDate)
     const taskEnd = new Date(task.endDate)
     
-    const totalDays = (end - start) / (1000 * 60 * 60 * 24)
+    // 表示範囲外のタスクは表示しない
+    if (taskEnd < start || taskStart > end) {
+      return { display: 'none' }
+    }
+    
+    const totalDays = (end - start) / (1000 * 60 * 60 * 24) + 1
     const startOffset = Math.max(0, (taskStart - start) / (1000 * 60 * 60 * 24))
-    const duration = (taskEnd - taskStart) / (1000 * 60 * 60 * 24)
+    const duration = Math.min((taskEnd - taskStart) / (1000 * 60 * 60 * 24) + 1, totalDays - startOffset)
     
     const left = (startOffset / totalDays) * 100
     const width = (duration / totalDays) * 100
     
     return {
       left: `${left}%`,
-      width: `${Math.max(width, 2)}%`,
+      width: `${Math.max(width, 1)}%`,
       backgroundColor: '#4285f4'
     }
   }
@@ -300,7 +310,7 @@ function ProjectDashboard({ session }) {
                     value="small" 
                     checked={scale === 'small'}
                     onChange={(e) => setScale(e.target.value)}
-                  /> 小（週単位）
+                  /> 小（3ヶ月）
                 </label>
                 <label>
                   <input 
@@ -309,7 +319,7 @@ function ProjectDashboard({ session }) {
                     value="medium" 
                     checked={scale === 'medium'}
                     onChange={(e) => setScale(e.target.value)}
-                  /> 中（3日単位）
+                  /> 中（1ヶ月）
                 </label>
                 <label>
                   <input 
@@ -318,7 +328,7 @@ function ProjectDashboard({ session }) {
                     value="large" 
                     checked={scale === 'large'}
                     onChange={(e) => setScale(e.target.value)}
-                  /> 大（日単位）
+                  /> 大（詳細）
                 </label>
               </div>
             </div>
