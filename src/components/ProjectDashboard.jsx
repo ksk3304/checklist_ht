@@ -147,16 +147,124 @@ function ProjectDashboard({ session }) {
 
       {/* ガントチャート */}
       <div className="gantt-section">
-        <h2 className="gantt-title">プロジェクト進捗ガントチャート</h2>
+        <h2 className="gantt-title">ガントチャート（業務横断）</h2>
         <div className="gantt-container">
-          <iframe
-            src="https://checklist-ht.vercel.app/gantt-widget"
-            width="100%"
-            height="600"
-            frameBorder="0"
-            title="ガントチャート"
-            className="gantt-iframe"
-          />
+          <div className="gantt-form">
+            <div className="gantt-inputs">
+              <input type="text" placeholder="タスク名" className="gantt-input" />
+              <input type="text" placeholder="担当者" className="gantt-input" />
+              <input type="date" className="gantt-input" />
+              <input type="date" className="gantt-input" />
+              <button className="gantt-add-btn">追加</button>
+            </div>
+            <div className="gantt-controls">
+              <div className="date-controls">
+                <label>表示開始日: <input type="date" className="gantt-date-input" /></label>
+                <label>表示終了日: <input type="date" className="gantt-date-input" /></label>
+              </div>
+              <div className="gantt-buttons">
+                <button className="gantt-period-btn">期間適用</button>
+                <button className="gantt-auto-btn">自動設定</button>
+              </div>
+              <div className="scale-controls">
+                <label>表示スケール:</label>
+                <label><input type="radio" name="scale" value="small" /> 小（3ヶ月）</label>
+                <label><input type="radio" name="scale" value="medium" defaultChecked /> 中（1ヶ月）</label>
+                <label><input type="radio" name="scale" value="large" /> 大（詳細）</label>
+              </div>
+            </div>
+          </div>
+          
+          <div className="gantt-chart">
+            <div className="gantt-notice">
+              <p>左右にスクロールできます</p>
+            </div>
+            <div className="gantt-table">
+              <div className="gantt-header">
+                <div className="gantt-col task-col">タスク</div>
+                <div className="gantt-col assignee-col">担当者</div>
+                <div className="gantt-col operation-col">操作</div>
+                <div className="gantt-timeline">
+                  <div className="timeline-dates">
+                    <div className="date-cell">5/28<br />水</div>
+                    <div className="date-cell">5/29<br />木</div>
+                    <div className="date-cell">5/30<br />金</div>
+                    <div className="date-cell">5/31<br />土</div>
+                    <div className="date-cell">6/1<br />日</div>
+                    <div className="date-cell">6/2<br />月</div>
+                    <div className="date-cell">6/3<br />火</div>
+                    <div className="date-cell">6/4<br />水</div>
+                    <div className="date-cell">6/5<br />木</div>
+                    <div className="date-cell">6/6<br />金</div>
+                    <div className="date-cell">6/7<br />土</div>
+                    <div className="date-cell">6/8<br />日</div>
+                    <div className="date-cell">6/9<br />月</div>
+                    <div className="date-cell">6/10<br />火</div>
+                    <div className="date-cell">6/11<br />水</div>
+                    <div className="date-cell">6/12<br />木</div>
+                    <div className="date-cell">6/13<br />金</div>
+                    <div className="date-cell">6/14<br />土</div>
+                    <div className="date-cell">6/15<br />日</div>
+                    <div className="date-cell">6/16<br />月</div>
+                    <div className="date-cell">6/17<br />火</div>
+                    <div className="date-cell">6/18<br />水</div>
+                  </div>
+                </div>
+              </div>
+              <div className="gantt-rows">
+                <div className="gantt-row">
+                  <div className="gantt-col task-col">エヌシーイー新潟国道</div>
+                  <div className="gantt-col assignee-col">AS,sg,os,kg,ma,tg</div>
+                  <div className="gantt-col operation-col">
+                    <button className="delete-task-btn">×</button>
+                    <button className="move-task-btn">::</button>
+                  </div>
+                  <div className="gantt-timeline">
+                    <div className="task-bar" style={{left: '27%', width: '45%', backgroundColor: '#4285f4'}}>
+                      エヌシーイー新潟国道
+                    </div>
+                  </div>
+                </div>
+                <div className="gantt-row">
+                  <div className="gantt-col task-col">キタック</div>
+                  <div className="gantt-col assignee-col">KG,os,ma,tg,ks</div>
+                  <div className="gantt-col operation-col">
+                    <button className="delete-task-btn">×</button>
+                    <button className="move-task-btn">::</button>
+                  </div>
+                  <div className="gantt-timeline">
+                    <div className="task-bar" style={{left: '77%', width: '23%', backgroundColor: '#4285f4'}}>
+                      キタック
+                    </div>
+                  </div>
+                </div>
+                <div className="gantt-row">
+                  <div className="gantt-col task-col">国際航業</div>
+                  <div className="gantt-col assignee-col">AS,sg,os,tg,ks(kg</div>
+                  <div className="gantt-col operation-col">
+                    <button className="delete-task-btn">×</button>
+                    <button className="move-task-btn">::</button>
+                  </div>
+                  <div className="gantt-timeline">
+                    <div className="task-bar" style={{left: '0%', width: '100%', backgroundColor: '#ccc'}}>
+                    </div>
+                  </div>
+                </div>
+                <div className="gantt-row">
+                  <div className="gantt-col task-col">エヌシーイー佐渡</div>
+                  <div className="gantt-col assignee-col">KS,as,ma,os</div>
+                  <div className="gantt-col operation-col">
+                    <button className="delete-task-btn">×</button>
+                    <button className="move-task-btn">::</button>
+                  </div>
+                  <div className="gantt-timeline">
+                    <div className="task-bar" style={{left: '0%', width: '100%', backgroundColor: '#ccc'}}>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

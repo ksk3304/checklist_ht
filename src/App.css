@@ -1197,20 +1197,226 @@ body {
 }
 
 .gantt-title {
-  color: #2563eb;
+  color: #333;
   margin-bottom: 1.5rem;
-  text-align: center;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .gantt-container {
-  border-radius: 8px;
-  overflow: hidden;
   border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
 }
 
-.gantt-iframe {
-  border-radius: 8px;
+.gantt-form {
+  margin-bottom: 2rem;
+}
+
+.gantt-inputs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.gantt-input {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.gantt-add-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.gantt-add-btn:hover {
+  background: #1d4ed8;
+}
+
+.gantt-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.date-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.gantt-date-input {
+  padding: 0.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+}
+
+.gantt-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.gantt-period-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.gantt-auto-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.scale-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.scale-controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.gantt-chart {
+  margin-top: 2rem;
+}
+
+.gantt-notice {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.gantt-notice p {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.gantt-table {
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.gantt-header {
+  display: flex;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: bold;
+}
+
+.gantt-row {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  min-height: 50px;
+}
+
+.gantt-col {
+  padding: 0.75rem;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+}
+
+.task-col {
+  width: 200px;
+  min-width: 200px;
+}
+
+.assignee-col {
+  width: 150px;
+  min-width: 150px;
+  font-size: 0.8rem;
+}
+
+.operation-col {
+  width: 80px;
+  min-width: 80px;
+  gap: 0.5rem;
+}
+
+.gantt-timeline {
+  flex: 1;
+  min-width: 800px;
+  position: relative;
+}
+
+.timeline-dates {
+  display: flex;
+  height: 100%;
+}
+
+.date-cell {
+  flex: 1;
+  padding: 0.5rem;
+  border-right: 1px solid #e5e7eb;
+  text-align: center;
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.task-bar {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 30px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.delete-task-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.move-task-btn {
+  background: #6b7280;
+  color: white;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Responsive */
