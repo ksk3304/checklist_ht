@@ -112,19 +112,10 @@ const ProfessionalGanttChart = () => {
       startDate = new Date(displayStartDate);
       endDate = new Date(displayEndDate);
     } else {
-      if (tasks.length === 0) {
-        const today = new Date();
-        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 30);
-        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 60);
-      } else {
-        const allStartDates = tasks.map(task => new Date(task.start_date));
-        const allEndDates = tasks.map(task => new Date(task.end_date));
-        const minDate = new Date(Math.min(...allStartDates));
-        const maxDate = new Date(Math.max(...allEndDates));
-        
-        startDate = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate() - 7);
-        endDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate() + 14);
-      }
+      // デフォルト表示：今日の1ヶ月前から6ヶ月後まで
+      const today = new Date();
+      startDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+      endDate = new Date(today.getFullYear(), today.getMonth() + 6, today.getDate());
     }
 
     const dates = [];
@@ -288,11 +279,29 @@ const ProfessionalGanttChart = () => {
 
       {/* スクロール案内 */}
       <div className="gantt-scroll-controls">
-        <button className="gantt-scroll-btn gantt-scroll-left" title="左へスクロール">
+        <button 
+          className="gantt-scroll-btn gantt-scroll-left" 
+          title="左へスクロール"
+          onClick={() => {
+            const scrollableArea = document.querySelector('.gantt-scrollable-right');
+            if (scrollableArea) {
+              scrollableArea.scrollLeft -= 200;
+            }
+          }}
+        >
           ←
         </button>
         <span className="gantt-scroll-info">左右にスクロールできます</span>
-        <button className="gantt-scroll-btn gantt-scroll-right" title="右へスクロール">
+        <button 
+          className="gantt-scroll-btn gantt-scroll-right" 
+          title="右へスクロール"
+          onClick={() => {
+            const scrollableArea = document.querySelector('.gantt-scrollable-right');
+            if (scrollableArea) {
+              scrollableArea.scrollLeft += 200;
+            }
+          }}
+        >
           →
         </button>
       </div>
@@ -334,15 +343,36 @@ const ProfessionalGanttChart = () => {
               const isWeekend = date.getDay() === 0 || date.getDay() === 6;
               const today = new Date();
               const isToday = date.toDateString() === today.toDateString();
+              const isFirstDayOfMonth = day === 1;
+              
+              // スケールに応じて表示内容を変更
+              let topContent, bottomContent;
+              
+              if (scale === 'small') {
+                // 3ヶ月表示：月の最初の日のみ月も表示、他は日だけ
+                topContent = isFirstDayOfMonth ? `${month}月${day}` : day;
+                bottomContent = '';  // 曜日は非表示
+              } else if (scale === 'medium') {
+                // 1ヶ月表示：月/日と曜日
+                topContent = `${month}/${day}`;
+                bottomContent = weekday;
+              } else {
+                // 詳細表示：月/日と曜日
+                topContent = `${month}/${day}`;
+                bottomContent = weekday;
+              }
               
               return (
                 <div 
                   key={index} 
                   className={`gantt-day-improved ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}`}
-                  style={{ width: `${dayWidth}px` }}
+                  style={{ 
+                    width: `${dayWidth}px`,
+                    borderRight: '1px solid #dee2e6'  // 週末でも罫線を表示
+                  }}
                 >
-                  <div className="date-top">{month}/{day}</div>
-                  <div className="date-bottom">{weekday}</div>
+                  <div className="date-top">{topContent}</div>
+                  {bottomContent && <div className="date-bottom">{bottomContent}</div>}
                 </div>
               );
             })}
@@ -354,6 +384,24 @@ const ProfessionalGanttChart = () => {
               const barInfo = calculateBarPosition(task, dates);
               return (
                 <div key={task.id} className="gantt-task-row" style={{ height: '50px', position: 'relative' }}>
+                  {/* 背景の縦線を表示 */}
+                  {dates.map((date, index) => {
+                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                    return (
+                      <div
+                        key={index}
+                        style={{
+                          position: 'absolute',
+                          left: `${index * dayWidth}px`,
+                          width: `${dayWidth}px`,
+                          height: '100%',
+                          borderRight: '1px solid #e0e0e0',
+                          backgroundColor: isWeekend ? 'rgba(255, 192, 203, 0.1)' : 'transparent',
+                          zIndex: 0
+                        }}
+                      />
+                    );
+                  })}
                   {barInfo && barInfo.isVisible && (
                     <div 
                       className="gantt-bar-improved" 
@@ -363,7 +411,8 @@ const ProfessionalGanttChart = () => {
                         width: `${barInfo.width}px`,
                         position: 'absolute',
                         top: '10px',
-                        height: '30px'
+                        height: '30px',
+                        zIndex: 10
                       }}
                     >
                       <span className="gantt-bar-text">{task.task_name}</span>
