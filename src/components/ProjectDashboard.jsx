@@ -9,6 +9,18 @@ function ProjectDashboard({ session }) {
   const [showForm, setShowForm] = useState(false)
   const navigate = useNavigate()
 
+  // ガントチャート用のstate
+  const [ganttTasks, setGanttTasks] = useState([
+    { id: 1, name: 'エヌシーイー新潟国道', assignee: 'AS,sg,os,kg,ma,tg', startDate: '2025-06-09', endDate: '2025-06-18' },
+    { id: 2, name: 'キタック', assignee: 'KG,os,ma,tg,ks', startDate: '2025-06-14', endDate: '2025-06-18' },
+    { id: 3, name: '国際航業', assignee: 'AS,sg,os,tg,ks(kg', startDate: '2025-05-28', endDate: '2025-06-18' },
+    { id: 4, name: 'エヌシーイー佐渡', assignee: 'KS,as,ma,os', startDate: '2025-05-28', endDate: '2025-06-18' }
+  ])
+  const [newGanttTask, setNewGanttTask] = useState({ name: '', assignee: '', startDate: '', endDate: '' })
+  const [displayStartDate, setDisplayStartDate] = useState('2025-05-28')
+  const [displayEndDate, setDisplayEndDate] = useState('2025-06-18')
+  const [scale, setScale] = useState('medium')
+
   useEffect(() => {
     fetchProjects()
   }, [])
@@ -63,6 +75,83 @@ function ProjectDashboard({ session }) {
       fetchProjects()
     } catch (error) {
       console.error('Error deleting project:', error)
+    }
+  }
+
+  // ガントチャート機能
+  const addGanttTask = () => {
+    if (!newGanttTask.name || !newGanttTask.assignee || !newGanttTask.startDate || !newGanttTask.endDate) {
+      alert('すべての項目を入力してください')
+      return
+    }
+    const newTask = {
+      id: Date.now(),
+      ...newGanttTask
+    }
+    setGanttTasks([...ganttTasks, newTask])
+    setNewGanttTask({ name: '', assignee: '', startDate: '', endDate: '' })
+  }
+
+  const deleteGanttTask = (id) => {
+    setGanttTasks(ganttTasks.filter(task => task.id !== id))
+  }
+
+  const applyPeriod = () => {
+    // 表示期間を適用（再レンダリングのトリガー）
+    setGanttTasks([...ganttTasks])
+  }
+
+  const autoSetPeriod = () => {
+    if (ganttTasks.length === 0) return
+    
+    const startDates = ganttTasks.map(task => new Date(task.startDate))
+    const endDates = ganttTasks.map(task => new Date(task.endDate))
+    
+    const minDate = new Date(Math.min(...startDates))
+    const maxDate = new Date(Math.max(...endDates))
+    
+    setDisplayStartDate(minDate.toISOString().split('T')[0])
+    setDisplayEndDate(maxDate.toISOString().split('T')[0])
+  }
+
+  // 日付範囲を生成
+  const generateDateRange = () => {
+    const start = new Date(displayStartDate)
+    const end = new Date(displayEndDate)
+    const dates = []
+    
+    let current = new Date(start)
+    while (current <= end) {
+      dates.push(new Date(current))
+      if (scale === 'small') {
+        current.setDate(current.getDate() + 7) // 週単位
+      } else if (scale === 'large') {
+        current.setDate(current.getDate() + 1) // 日単位
+      } else {
+        current.setDate(current.getDate() + 3) // 3日単位
+      }
+    }
+    return dates
+  }
+
+  // タスクバーの位置とサイズを計算
+  const calculateTaskBarStyle = (task) => {
+    const start = new Date(displayStartDate)
+    const end = new Date(displayEndDate)
+    const taskStart = new Date(task.startDate)
+    const taskEnd = new Date(task.endDate)
+    
+    const totalDays = (end - start) / (1000 * 60 * 60 * 24)
+    const startOffset = Math.max(0, (taskStart - start) / (1000 * 60 * 60 * 24))
+    const duration = (taskEnd - taskStart) / (1000 * 60 * 60 * 24)
+    
+    const left = (startOffset / totalDays) * 100
+    const width = (duration / totalDays) * 100
+    
+    return {
+      left: `${left}%`,
+      width: `${Math.max(width, 2)}%`,
+      backgroundColor: '#4285f4'
     }
   }
 
@@ -151,26 +240,86 @@ function ProjectDashboard({ session }) {
         <div className="gantt-container">
           <div className="gantt-form">
             <div className="gantt-inputs">
-              <input type="text" placeholder="タスク名" className="gantt-input" />
-              <input type="text" placeholder="担当者" className="gantt-input" />
-              <input type="date" className="gantt-input" />
-              <input type="date" className="gantt-input" />
-              <button className="gantt-add-btn">追加</button>
+              <input 
+                type="text" 
+                placeholder="タスク名" 
+                className="gantt-input"
+                value={newGanttTask.name}
+                onChange={(e) => setNewGanttTask({...newGanttTask, name: e.target.value})}
+              />
+              <input 
+                type="text" 
+                placeholder="担当者" 
+                className="gantt-input"
+                value={newGanttTask.assignee}
+                onChange={(e) => setNewGanttTask({...newGanttTask, assignee: e.target.value})}
+              />
+              <input 
+                type="date" 
+                className="gantt-input"
+                value={newGanttTask.startDate}
+                onChange={(e) => setNewGanttTask({...newGanttTask, startDate: e.target.value})}
+              />
+              <input 
+                type="date" 
+                className="gantt-input"
+                value={newGanttTask.endDate}
+                onChange={(e) => setNewGanttTask({...newGanttTask, endDate: e.target.value})}
+              />
+              <button className="gantt-add-btn" onClick={addGanttTask}>追加</button>
             </div>
             <div className="gantt-controls">
               <div className="date-controls">
-                <label>表示開始日: <input type="date" className="gantt-date-input" /></label>
-                <label>表示終了日: <input type="date" className="gantt-date-input" /></label>
+                <label>表示開始日: 
+                  <input 
+                    type="date" 
+                    className="gantt-date-input"
+                    value={displayStartDate}
+                    onChange={(e) => setDisplayStartDate(e.target.value)}
+                  />
+                </label>
+                <label>表示終了日: 
+                  <input 
+                    type="date" 
+                    className="gantt-date-input"
+                    value={displayEndDate}
+                    onChange={(e) => setDisplayEndDate(e.target.value)}
+                  />
+                </label>
               </div>
               <div className="gantt-buttons">
-                <button className="gantt-period-btn">期間適用</button>
-                <button className="gantt-auto-btn">自動設定</button>
+                <button className="gantt-period-btn" onClick={applyPeriod}>期間適用</button>
+                <button className="gantt-auto-btn" onClick={autoSetPeriod}>自動設定</button>
               </div>
               <div className="scale-controls">
                 <label>表示スケール:</label>
-                <label><input type="radio" name="scale" value="small" /> 小（3ヶ月）</label>
-                <label><input type="radio" name="scale" value="medium" defaultChecked /> 中（1ヶ月）</label>
-                <label><input type="radio" name="scale" value="large" /> 大（詳細）</label>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="scale" 
+                    value="small" 
+                    checked={scale === 'small'}
+                    onChange={(e) => setScale(e.target.value)}
+                  /> 小（週単位）
+                </label>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="scale" 
+                    value="medium" 
+                    checked={scale === 'medium'}
+                    onChange={(e) => setScale(e.target.value)}
+                  /> 中（3日単位）
+                </label>
+                <label>
+                  <input 
+                    type="radio" 
+                    name="scale" 
+                    value="large" 
+                    checked={scale === 'large'}
+                    onChange={(e) => setScale(e.target.value)}
+                  /> 大（日単位）
+                </label>
               </div>
             </div>
           </div>
@@ -186,82 +335,31 @@ function ProjectDashboard({ session }) {
                 <div className="gantt-col operation-col">操作</div>
                 <div className="gantt-timeline">
                   <div className="timeline-dates">
-                    <div className="date-cell">5/28<br />水</div>
-                    <div className="date-cell">5/29<br />木</div>
-                    <div className="date-cell">5/30<br />金</div>
-                    <div className="date-cell">5/31<br />土</div>
-                    <div className="date-cell">6/1<br />日</div>
-                    <div className="date-cell">6/2<br />月</div>
-                    <div className="date-cell">6/3<br />火</div>
-                    <div className="date-cell">6/4<br />水</div>
-                    <div className="date-cell">6/5<br />木</div>
-                    <div className="date-cell">6/6<br />金</div>
-                    <div className="date-cell">6/7<br />土</div>
-                    <div className="date-cell">6/8<br />日</div>
-                    <div className="date-cell">6/9<br />月</div>
-                    <div className="date-cell">6/10<br />火</div>
-                    <div className="date-cell">6/11<br />水</div>
-                    <div className="date-cell">6/12<br />木</div>
-                    <div className="date-cell">6/13<br />金</div>
-                    <div className="date-cell">6/14<br />土</div>
-                    <div className="date-cell">6/15<br />日</div>
-                    <div className="date-cell">6/16<br />月</div>
-                    <div className="date-cell">6/17<br />火</div>
-                    <div className="date-cell">6/18<br />水</div>
+                    {generateDateRange().map((date, index) => (
+                      <div key={index} className="date-cell">
+                        {date.getMonth() + 1}/{date.getDate()}<br />
+                        {['日', '月', '火', '水', '木', '金', '土'][date.getDay()]}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
               <div className="gantt-rows">
-                <div className="gantt-row">
-                  <div className="gantt-col task-col">エヌシーイー新潟国道</div>
-                  <div className="gantt-col assignee-col">AS,sg,os,kg,ma,tg</div>
-                  <div className="gantt-col operation-col">
-                    <button className="delete-task-btn">×</button>
-                    <button className="move-task-btn">::</button>
-                  </div>
-                  <div className="gantt-timeline">
-                    <div className="task-bar" style={{left: '27%', width: '45%', backgroundColor: '#4285f4'}}>
-                      エヌシーイー新潟国道
+                {ganttTasks.map((task) => (
+                  <div key={task.id} className="gantt-row">
+                    <div className="gantt-col task-col">{task.name}</div>
+                    <div className="gantt-col assignee-col">{task.assignee}</div>
+                    <div className="gantt-col operation-col">
+                      <button className="delete-task-btn" onClick={() => deleteGanttTask(task.id)}>×</button>
+                      <button className="move-task-btn">::</button>
+                    </div>
+                    <div className="gantt-timeline">
+                      <div className="task-bar" style={calculateTaskBarStyle(task)}>
+                        {task.name}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="gantt-row">
-                  <div className="gantt-col task-col">キタック</div>
-                  <div className="gantt-col assignee-col">KG,os,ma,tg,ks</div>
-                  <div className="gantt-col operation-col">
-                    <button className="delete-task-btn">×</button>
-                    <button className="move-task-btn">::</button>
-                  </div>
-                  <div className="gantt-timeline">
-                    <div className="task-bar" style={{left: '77%', width: '23%', backgroundColor: '#4285f4'}}>
-                      キタック
-                    </div>
-                  </div>
-                </div>
-                <div className="gantt-row">
-                  <div className="gantt-col task-col">国際航業</div>
-                  <div className="gantt-col assignee-col">AS,sg,os,tg,ks(kg</div>
-                  <div className="gantt-col operation-col">
-                    <button className="delete-task-btn">×</button>
-                    <button className="move-task-btn">::</button>
-                  </div>
-                  <div className="gantt-timeline">
-                    <div className="task-bar" style={{left: '0%', width: '100%', backgroundColor: '#ccc'}}>
-                    </div>
-                  </div>
-                </div>
-                <div className="gantt-row">
-                  <div className="gantt-col task-col">エヌシーイー佐渡</div>
-                  <div className="gantt-col assignee-col">KS,as,ma,os</div>
-                  <div className="gantt-col operation-col">
-                    <button className="delete-task-btn">×</button>
-                    <button className="move-task-btn">::</button>
-                  </div>
-                  <div className="gantt-timeline">
-                    <div className="task-bar" style={{left: '0%', width: '100%', backgroundColor: '#ccc'}}>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
