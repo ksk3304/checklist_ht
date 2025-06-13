@@ -144,6 +144,21 @@ function ProjectDashboard({ session }) {
           ))
         )}
       </div>
+
+      {/* ガントチャート */}
+      <div className="gantt-section">
+        <h2 className="gantt-title">プロジェクト進捗ガントチャート</h2>
+        <div className="gantt-container">
+          <iframe
+            src="https://checklist-ht.vercel.app/gantt-widget"
+            width="100%"
+            height="600"
+            frameBorder="0"
+            title="ガントチャート"
+            className="gantt-iframe"
+          />
+        </div>
+      </div>
     </div>
   )
 }

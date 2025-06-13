@@ -1187,6 +1187,32 @@ body {
   background: #10b981;
 }
 
+/* Gantt Chart styles */
+.gantt-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-top: 2rem;
+}
+
+.gantt-title {
+  color: #2563eb;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.gantt-container {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.gantt-iframe {
+  border-radius: 8px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .app-header {
