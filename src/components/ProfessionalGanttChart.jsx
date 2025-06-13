@@ -19,8 +19,7 @@ const ProfessionalGanttChart = () => {
   // データ読み込み
   useEffect(() => {
     loadTasks();
-    const interval = setInterval(loadTasks, 30000);
-    return () => clearInterval(interval);
+    // 自動更新を無効化
   }, []);
 
   const loadTasks = async () => {
@@ -405,29 +404,25 @@ const ProfessionalGanttChart = () => {
           </div>
 
           {/* タスクバーエリア */}
-          <div className="gantt-bars-container" style={{ width: `${dates.length * dayWidth}px` }}>
+          <div 
+            className="gantt-bars-container" 
+            style={{ 
+              width: `${dates.length * dayWidth}px`,
+              // CSS背景で縦線を表示（パフォーマンス向上）
+              backgroundImage: `repeating-linear-gradient(
+                to right,
+                transparent,
+                transparent ${dayWidth - 1}px,
+                #e0e0e0 ${dayWidth - 1}px,
+                #e0e0e0 ${dayWidth}px
+              )`,
+              position: 'relative'
+            }}
+          >
             {tasks.map(task => {
               const barInfo = calculateBarPosition(task, dates);
               return (
                 <div key={task.id} className="gantt-task-row" style={{ height: '50px', position: 'relative' }}>
-                  {/* 背景の縦線を表示 */}
-                  {dates.map((date, index) => {
-                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-                    return (
-                      <div
-                        key={index}
-                        style={{
-                          position: 'absolute',
-                          left: `${index * dayWidth}px`,
-                          width: `${dayWidth}px`,
-                          height: '100%',
-                          borderRight: '1px solid #e0e0e0',
-                          backgroundColor: isWeekend ? 'rgba(255, 192, 203, 0.1)' : 'transparent',
-                          zIndex: 0
-                        }}
-                      />
-                    );
-                  })}
                   {barInfo && barInfo.isVisible && (
                     <div 
                       className="gantt-bar-improved" 
