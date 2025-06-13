@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 
 const ProfessionalGanttChart = () => {
   const [tasks, setTasks] = useState([]);
@@ -10,11 +10,15 @@ const ProfessionalGanttChart = () => {
   const [newTask, setNewTask] = useState({ task_name: '', member: '', start_date: '', end_date: '' });
   const [showExtraColumns, setShowExtraColumns] = useState(false);
 
-  // Supabase設定
-  const supabase = createClient(
-    'https://xznyjfxscqshjckdyefc.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6bnlqZnhzY3FzaGpja2R5ZWZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0NDE0OTgsImV4cCI6MjA2MzAxNzQ5OH0.T4RLIrHHmilAbMFIidhty8tMkY9gk-01_KPB7wEDvq0'
-  );
+
+  // パフォーマンス診断
+  React.useEffect(() => {
+    console.log('=== パフォーマンス診断 ===');
+    console.log('デバイスピクセル比:', window.devicePixelRatio);
+    console.log('画面解像度:', window.screen.width, 'x', window.screen.height);
+    console.log('ビューポート:', window.innerWidth, 'x', window.innerHeight);
+    console.log('ブラウザ:', navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Safari');
+  }, []);
 
   // データ読み込み
   useEffect(() => {
@@ -38,17 +42,38 @@ const ProfessionalGanttChart = () => {
 
       for (const tableName of tableNames) {
         try {
-          const result = await supabase
+          console.log(`テーブル ${tableName} を試行中...`);
+          
+          // progressスキーマで試行
+          let result = await supabase
             .from(tableName)
             .select('*')
             .order('start_date', { ascending: true });
 
-          if (!result.error && result.data) {
+          console.log(`progress.${tableName} 結果:`, result);
+          
+          if (!result.error && result.data && result.data.length > 0) {
             data = result.data;
-            successTable = tableName;
+            successTable = `progress.${tableName}`;
+            break;
+          }
+          
+          // publicスキーマでも試行
+          result = await supabase
+            .schema('public')
+            .from(tableName)
+            .select('*')
+            .order('start_date', { ascending: true });
+            
+          console.log(`public.${tableName} 結果:`, result);
+          
+          if (!result.error && result.data && result.data.length > 0) {
+            data = result.data;
+            successTable = `public.${tableName}`;
             break;
           }
         } catch (e) {
+          console.log(`${tableName} でエラー:`, e);
           continue;
         }
       }
@@ -112,10 +137,10 @@ const ProfessionalGanttChart = () => {
       startDate = new Date(displayStartDate);
       endDate = new Date(displayEndDate);
     } else {
-      // デフォルト表示：今日から3ヶ月後まで
+      // デフォルト表示：今日の1ヶ月前から6ヶ月後まで
       const today = new Date();
-      startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      endDate = new Date(today.getFullYear(), today.getMonth() + 3, today.getDate());
+      startDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+      endDate = new Date(today.getFullYear(), today.getMonth() + 6, today.getDate());
     }
 
     const dates = [];
@@ -175,7 +200,14 @@ const ProfessionalGanttChart = () => {
   const dayWidth = getDayWidth();
 
   return (
-    <div className="gantt-section">
+    <div 
+      className="gantt-section"
+      style={{
+        // High-DPI最適化: GPU加速を強制
+        transform: 'translateZ(0)',
+        willChange: 'transform'
+      }}
+    >
       {/* タイトル */}
       <h2 className="gantt-title">ガントチャート（業務横断）</h2>
 
