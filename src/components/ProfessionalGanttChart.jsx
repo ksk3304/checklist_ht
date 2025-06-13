@@ -104,18 +104,18 @@ const ProfessionalGanttChart = () => {
     setDisplayEndDate(adjustedEndDate.toISOString().split('T')[0]);
   };
 
-  // 日付範囲計算
-  const calculateDateRange = () => {
+  // 日付範囲計算（メモ化で最適化）
+  const calculateDateRange = React.useMemo(() => {
     let startDate, endDate;
     
     if (displayStartDate && displayEndDate) {
       startDate = new Date(displayStartDate);
       endDate = new Date(displayEndDate);
     } else {
-      // デフォルト表示：今日の1ヶ月前から6ヶ月後まで
+      // デフォルト表示：今日から3ヶ月後まで
       const today = new Date();
-      startDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-      endDate = new Date(today.getFullYear(), today.getMonth() + 6, today.getDate());
+      startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      endDate = new Date(today.getFullYear(), today.getMonth() + 3, today.getDate());
     }
 
     const dates = [];
@@ -126,7 +126,7 @@ const ProfessionalGanttChart = () => {
     }
 
     return dates;
-  };
+  }, [displayStartDate, displayEndDate]);
 
   // 日幅取得
   const getDayWidth = () => {
@@ -171,7 +171,7 @@ const ProfessionalGanttChart = () => {
     );
   }
 
-  const dates = calculateDateRange();
+  const dates = calculateDateRange;
   const dayWidth = getDayWidth();
 
   return (
@@ -408,7 +408,7 @@ const ProfessionalGanttChart = () => {
             className="gantt-bars-container" 
             style={{ 
               width: `${dates.length * dayWidth}px`,
-              // CSS背景で縦線を表示（パフォーマンス向上）
+              // CSS背景で縦線を表示（DOM要素を大幅削減）
               backgroundImage: `repeating-linear-gradient(
                 to right,
                 transparent,
